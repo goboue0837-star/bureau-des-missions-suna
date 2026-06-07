@@ -419,9 +419,11 @@ function renderSemaine(){
       <td><div class="bar-wrap"><div class="bar bar-week" style="width:${p}%"></div></div></td>
     </tr>`;
   }).join('');
+  const resetBtn=isAdmin?`<button class="btn btn-blue btn-sm" onclick="resetWeek()" style="white-space:nowrap">⚡ Réinitialiser</button>`:'';
   document.getElementById('tab-semaine').innerHTML=`
     <div class="week-header">
       <span class="week-reset-info">⚡ POINTS DE LA SEMAINE — ${resetInfo}</span>
+      ${resetBtn}
     </div>
     <table><thead><tr><th>#</th><th>NINJA</th><th>RANG</th><th>MISSIONS</th><th>PTS SEMAINE</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="6" style="text-align:center;color:#3a2a00;padding:20px">Aucune mission cette semaine.</td></tr>'}</tbody></table>`;
 }
@@ -475,11 +477,13 @@ function renderHistory(){
   if(!el)return;
   if(!globalHistory.length){el.innerHTML='<div class="log-empty">Aucune action enregistrée.</div>';return;}
   el.innerHTML=[...globalHistory].reverse().map(h=>{
-    if(h.type==='mission'){const res=h.result==='success'?'<span class="hist-ok">Succès</span>':'<span class="hist-fail">Échec</span>';return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${h.by||'?'}</div><span class="log-mission">⚔ Mission Rang ${h.rank}</span> ${res} +${h.pts}pts — ${h.ninjas.join(', ')}</div>`;}
-    if(h.type==='sanction')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${h.by||'?'}</div><span class="log-sanction">⚠ Sanction</span> ${h.pts}pts — ${h.ninja}</div>`;
-    if(h.type==='add')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${h.by||'?'}</div><span class="log-add">+ Ajout ninja</span> — ${h.ninja}${h.rang?' ('+h.rang+')':''}</div>`;
-    if(h.type==='remove')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${h.by||'?'}</div><span class="log-remove">✕ Suppression</span> — ${h.ninja}</div>`;
-    if(h.type==='week_reset')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${h.by||'?'}</div><span class="log-week">⚡ Réinitialisation semaine</span></div>`;
+    const who=`<b style="color:#e0c97f">${h.by||'ancien'}</b>`;
+    if(h.type==='mission'){const res=h.result==='success'?'<span class="hist-ok">Succès</span>':'<span class="hist-fail">Échec</span>';return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${who}</div><span class="log-mission">⚔ Mission Rang ${h.rank}</span> ${res} +${h.pts}pts — ${h.ninjas.join(', ')}</div>`;}
+    if(h.type==='sanction')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${who}</div><span class="log-sanction">⚠ Sanction</span> ${h.pts}pts — ${h.ninja}</div>`;
+    if(h.type==='add')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${who}</div><span class="log-add">+ Ajout ninja</span> — ${h.ninja}${h.rang?' ('+h.rang+')':''}</div>`;
+    if(h.type==='remove')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${who}</div><span class="log-remove">✕ Suppression</span> — ${h.ninja}</div>`;
+    if(h.type==='rang')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${who}</div><span class="log-add">✎ Rang modifié</span> — ${h.ninja} → ${h.rang||'—'}</div>`;
+    if(h.type==='week_reset')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${who}</div><span class="log-week">⚡ Réinitialisation semaine</span></div>`;
     return'';
   }).join('');
 }
@@ -588,6 +592,7 @@ async function editRang(){
   const rang=document.getElementById('edit-ninja-rang').value;
   const n=ninjas.find(x=>x.name===name);if(!n)return;
   n.rang=rang;
+  globalHistory.push({type:'rang',date:new Date().toISOString(),ninja:name,rang,by:currentAdminName});
   const ok=await saveData();
   if(ok){render();showStatus(`Rang de ${name} : ${rang||'—'}.`,true);}
   else showStatus('Erreur.',false);
