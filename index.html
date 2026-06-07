@@ -510,7 +510,7 @@ function switchGerantTab(tab,btn){
   document.querySelectorAll('.gerant-tab').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.gerant-section').forEach(s=>s.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('admin-'+tab).classList.add('active');
+  document.getElementById('gerant-'+tab).classList.add('active');
   if(tab==='historique')renderHistory();
   if(tab==='stats')renderGerantStats();
 }
