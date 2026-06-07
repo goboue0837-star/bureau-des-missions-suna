@@ -519,12 +519,24 @@ function openProfile(name){
   const taux=n.missions>0?Math.round((n.successCount||0)/n.missions*100)+'%':'—';
   document.getElementById('p-taux').textContent=taux;
   const hist=n.history||[];
-  document.getElementById('p-history').innerHTML=hist.length?[...hist].reverse().map(h=>`<div class="hist-item">
-    <span class="hist-rank">${h.rank}</span>
-    <span>${h.result==='success'?'<span class="hist-ok">Succès</span>':'<span class="hist-fail">Échec</span>'}</span>
-    <span style="color:#c88600">+${h.pts}pts</span>
-    <span class="hist-date">${fmtDate(h.date)}</span>
-  </div>`).join(''):'<div style="color:#3a2a00;font-style:italic;padding:10px 0">Aucune mission enregistrée.</div>';
+  const histHTML=[...hist].reverse().map(h=>{
+    if(h.type==='sanction'){
+      return`<div class="hist-item">
+        <span style="color:#e04040;font-weight:700;min-width:20px">⚠</span>
+        <span class="hist-fail">Sanction</span>
+        <span style="color:#888;font-size:.78rem;flex:1">${h.label||''}</span>
+        <span style="color:#e04040">${h.pts}pts</span>
+        <span class="hist-date">${fmtDate(h.date)}</span>
+      </div>`;
+    }
+    return`<div class="hist-item">
+      <span class="hist-rank">${h.rank}</span>
+      <span>${h.result==='success'?'<span class="hist-ok">Succès</span>':'<span class="hist-fail">Échec</span>'}</span>
+      <span style="color:#c88600">${h.pts>0?'+'+h.pts+'pts':'0pt'}</span>
+      <span class="hist-date">${fmtDate(h.date)}</span>
+    </div>`;
+  }).join('');
+  document.getElementById('p-history').innerHTML=hist.length?histHTML:'<div style="color:#3a2a00;font-style:italic;padding:10px 0">Aucune entrée enregistrée.</div>';
   document.getElementById('profile-overlay').classList.add('show');
 }
 function closeProfile(e){if(e.target===document.getElementById('profile-overlay'))closeProfileBtn();}
@@ -559,10 +571,13 @@ async function submitMission(){
 async function submitSanction(){
   const name=document.getElementById('sanction-ninja').value;
   const pts=parseInt(document.getElementById('sanction-type').value);
+  const label=document.getElementById('sanction-type').options[document.getElementById('sanction-type').selectedIndex].text;
   const n=ninjas.find(x=>x.name===name);if(!n)return;
   n.points=Math.max(0,n.points+pts);
   const now=new Date().toISOString();
-  globalHistory.push({type:'sanction',date:now,ninja:name,pts,by:currentAdminName});
+  if(!n.history)n.history=[];
+  n.history.push({date:now,type:'sanction',pts,label});
+  globalHistory.push({type:'sanction',date:now,ninja:name,pts,label,by:currentAdminName});
   const ok=await saveData();
   if(ok){render();showStatus(`Sanction appliquée à ${name} (${pts}pts).`,true);}
   else showStatus('Erreur.',false);
