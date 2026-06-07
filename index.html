@@ -3,250 +3,123 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Naruto RP — Registre des Mérites</title>
+  <title>Bureau des Missions Suna</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Rajdhani:wght@400;600&display=swap');
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      background: #0a0a0a;
-      color: #e0c97f;
-      font-family: 'Rajdhani', sans-serif;
-      min-height: 100vh;
-      background-image: radial-gradient(ellipse at top, #1a0a00 0%, #0a0a0a 60%);
-    }
-
-    header {
-      text-align: center;
-      padding: 40px 20px 24px;
-      border-bottom: 1px solid #2a1a00;
-      position: relative;
-    }
-
-    header h1 {
-      font-family: 'Cinzel', serif;
-      font-size: 2.2rem;
-      color: #e0c97f;
-      letter-spacing: 4px;
-      text-shadow: 0 0 20px #c8860060;
-    }
-
-    header p { color: #7a6a40; margin-top: 6px; font-size: 0.9rem; letter-spacing: 2px; }
-
-    #login-btn {
-      position: absolute;
-      right: 24px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: 1px solid #3a2a00;
-      color: #7a6a40;
-      padding: 8px 16px;
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.85rem;
-      letter-spacing: 1px;
-      cursor: pointer;
-      border-radius: 4px;
-      transition: all 0.2s;
-    }
-    #login-btn:hover { border-color: #c88600; color: #c88600; }
-    #login-btn.active { border-color: #c88600; color: #c88600; background: #1a0f00; }
-
-    .container { max-width: 860px; margin: 0 auto; padding: 0 20px 60px; }
-
-    /* Stats */
-    .stats-bar {
-      display: flex;
-      justify-content: center;
-      gap: 40px;
-      margin: 32px 0;
-      padding: 20px;
-      background: #111;
-      border: 1px solid #1e1400;
-      border-radius: 8px;
-    }
-    .stat { text-align: center; }
-    .stat .number { font-family: 'Cinzel', serif; font-size: 2rem; color: #c88600; }
-    .stat .label { font-size: 0.8rem; color: #7a6a40; letter-spacing: 1px; }
-
-    /* Table */
-    table { width: 100%; border-collapse: collapse; }
-    thead tr { background: #140e00; border-bottom: 2px solid #c88600; }
-    thead th {
-      padding: 12px 16px;
-      text-align: left;
-      font-family: 'Cinzel', serif;
-      font-size: 0.8rem;
-      letter-spacing: 2px;
-      color: #c88600;
-    }
-    tbody tr { border-bottom: 1px solid #1a1200; transition: background 0.2s; }
-    tbody tr:hover { background: #130e00; }
-    tbody td { padding: 12px 16px; font-size: 1rem; }
-
-    .rank-num { font-weight: 700; color: #c88600; }
-    .grade-badge {
-      display: inline-block;
-      padding: 2px 10px;
-      border-radius: 12px;
-      font-size: 0.78rem;
-      letter-spacing: 1px;
-      font-weight: 600;
-    }
-    .grade-0 { background: #1a1a1a; color: #888; border: 1px solid #333; }
-    .grade-1 { background: #1a1500; color: #c8a020; border: 1px solid #c8a020; }
-    .grade-2 { background: #001a12; color: #20c880; border: 1px solid #20c880; }
-    .grade-3 { background: #001020; color: #2090e0; border: 1px solid #2090e0; }
-    .grade-4 { background: #1a0020; color: #c020e0; border: 1px solid #c020e0; }
-    .grade-5 { background: #1a0800; color: #ff6600; border: 1px solid #ff6600; }
-
-    .bar-wrap { background: #1a1200; border-radius: 4px; height: 5px; width: 100px; overflow: hidden; display: inline-block; }
-    .bar { height: 100%; background: linear-gradient(90deg, #c88600, #ffe066); border-radius: 4px; }
-
-    /* Login overlay */
-    #login-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: #000000cc;
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
-    }
-    #login-overlay.show { display: flex; }
-    .login-box {
-      background: #111;
-      border: 1px solid #3a2a00;
-      border-radius: 10px;
-      padding: 40px;
-      width: 340px;
-      text-align: center;
-    }
-    .login-box h2 { font-family: 'Cinzel', serif; color: #c88600; margin-bottom: 24px; letter-spacing: 2px; }
-    .login-box input {
-      width: 100%;
-      background: #0a0a0a;
-      border: 1px solid #3a2a00;
-      color: #e0c97f;
-      padding: 10px 14px;
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 1rem;
-      border-radius: 4px;
-      margin-bottom: 12px;
-    }
-    .login-box input:focus { outline: none; border-color: #c88600; }
-    .btn {
-      background: #c88600;
-      color: #000;
-      border: none;
-      padding: 10px 24px;
-      font-family: 'Cinzel', serif;
-      font-size: 0.9rem;
-      letter-spacing: 1px;
-      border-radius: 4px;
-      cursor: pointer;
-      width: 100%;
-      margin-top: 4px;
-      transition: background 0.2s;
-    }
-    .btn:hover { background: #ffe066; }
-    .btn-secondary {
-      background: none;
-      border: 1px solid #3a2a00;
-      color: #7a6a40;
-      margin-top: 8px;
-    }
-    .btn-secondary:hover { border-color: #c88600; color: #c88600; background: none; }
-    #login-error { color: #e04040; font-size: 0.85rem; margin-top: 8px; display: none; }
-
-    /* Admin panel */
-    #admin-panel {
-      display: none;
-      margin-top: 32px;
-      background: #0e0900;
-      border: 1px solid #3a2a00;
-      border-radius: 10px;
-      padding: 28px;
-    }
-    #admin-panel.show { display: block; }
-    #admin-panel h2 { font-family: 'Cinzel', serif; color: #c88600; letter-spacing: 2px; margin-bottom: 24px; font-size: 1.1rem; }
-
-    .admin-section { margin-bottom: 28px; padding-bottom: 28px; border-bottom: 1px solid #1e1400; }
-    .admin-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-    .admin-section h3 { color: #e0c97f; font-size: 0.95rem; letter-spacing: 1px; margin-bottom: 14px; }
-
-    .form-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
-    .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-group label { font-size: 0.8rem; color: #7a6a40; letter-spacing: 1px; }
-    .form-group select, .form-group input {
-      background: #0a0a0a;
-      border: 1px solid #3a2a00;
-      color: #e0c97f;
-      padding: 8px 12px;
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.95rem;
-      border-radius: 4px;
-      min-width: 140px;
-    }
-    .form-group select:focus, .form-group input:focus { outline: none; border-color: #c88600; }
-
-    /* Ninja checkboxes */
-    #ninja-checkboxes {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 8px;
-      margin-bottom: 14px;
-      max-height: 220px;
-      overflow-y: auto;
-      padding: 10px;
-      background: #0a0a0a;
-      border: 1px solid #1e1400;
-      border-radius: 6px;
-    }
-    .ninja-check {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      padding: 4px 6px;
-      border-radius: 4px;
-      transition: background 0.15s;
-    }
-    .ninja-check:hover { background: #1a1200; }
-    .ninja-check input[type=checkbox] { accent-color: #c88600; width: 14px; height: 14px; }
-    .ninja-check span { font-size: 0.9rem; }
-
-    .select-controls { display: flex; gap: 8px; margin-bottom: 10px; }
-    .select-controls button {
-      background: none;
-      border: 1px solid #2a1a00;
-      color: #7a6a40;
-      padding: 4px 12px;
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.8rem;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .select-controls button:hover { border-color: #c88600; color: #c88600; }
-
-    .btn-sm { padding: 8px 20px; font-size: 0.85rem; width: auto; }
-
-    #status-msg {
-      margin-top: 10px;
-      font-size: 0.85rem;
-      display: none;
-    }
-    #status-msg.ok { color: #20c880; display: block; }
-    #status-msg.err { color: #e04040; display: block; }
-
-    footer { text-align: center; padding: 20px; color: #2a1a00; font-size: 0.75rem; letter-spacing: 1px; }
-
-    .loading { text-align: center; padding: 60px; color: #3a2a00; font-family: 'Cinzel', serif; letter-spacing: 2px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#0a0a0a;color:#e0c97f;font-family:'Rajdhani',sans-serif;min-height:100vh;background-image:radial-gradient(ellipse at top,#1a0a00 0%,#0a0a0a 60%)}
+    header{text-align:center;padding:36px 20px 20px;border-bottom:1px solid #2a1a00;position:relative}
+    header h1{font-family:'Cinzel',serif;font-size:2rem;color:#e0c97f;letter-spacing:4px;text-shadow:0 0 20px #c8860060}
+    header p{color:#7a6a40;margin-top:5px;font-size:.85rem;letter-spacing:2px}
+    #login-btn{position:absolute;right:20px;top:50%;transform:translateY(-50%);background:none;border:1px solid #3a2a00;color:#7a6a40;padding:7px 14px;font-family:'Rajdhani',sans-serif;font-size:.85rem;letter-spacing:1px;cursor:pointer;border-radius:4px;transition:all .2s}
+    #login-btn:hover,#login-btn.active{border-color:#c88600;color:#c88600;background:#1a0f00}
+    .container{max-width:900px;margin:0 auto;padding:0 16px 60px}
+    /* STATS */
+    .stats-bar{display:flex;justify-content:center;gap:40px;margin:28px 0 20px;padding:18px;background:#111;border:1px solid #1e1400;border-radius:8px}
+    .stat{text-align:center}.stat .number{font-family:'Cinzel',serif;font-size:1.8rem;color:#c88600}.stat .label{font-size:.75rem;color:#7a6a40;letter-spacing:1px}
+    /* SEARCH */
+    .search-wrap{margin-bottom:16px;position:relative}
+    .search-wrap input{width:100%;background:#0e0900;border:1px solid #2a1a00;color:#e0c97f;padding:10px 16px 10px 38px;font-family:'Rajdhani',sans-serif;font-size:1rem;border-radius:6px}
+    .search-wrap input:focus{outline:none;border-color:#c88600}
+    .search-wrap::before{content:"⌕";position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#7a6a40;font-size:1.2rem}
+    /* TABS */
+    .tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid #2a1a00}
+    .tab-btn{background:none;border:none;color:#7a6a40;padding:10px 20px;font-family:'Rajdhani',sans-serif;font-size:.95rem;letter-spacing:1px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s}
+    .tab-btn.active{color:#c88600;border-bottom-color:#c88600}
+    .tab-btn:hover{color:#e0c97f}
+    /* TABLE */
+    table{width:100%;border-collapse:collapse}
+    thead tr{background:#140e00;border-bottom:2px solid #c88600}
+    thead th{padding:10px 14px;text-align:left;font-family:'Cinzel',serif;font-size:.75rem;letter-spacing:2px;color:#c88600}
+    tbody tr{border-bottom:1px solid #1a1200;cursor:pointer;transition:background .15s}
+    tbody tr:hover{background:#130e00}
+    tbody td{padding:10px 14px;font-size:.95rem}
+    .rank-num{font-weight:700;color:#c88600}
+    .grade-badge{display:inline-block;padding:2px 9px;border-radius:12px;font-size:.72rem;letter-spacing:1px;font-weight:600}
+    .g0{background:#1a1a1a;color:#888;border:1px solid #333}
+    .g1{background:#1a1500;color:#c8a020;border:1px solid #c8a020}
+    .g2{background:#001a12;color:#20c880;border:1px solid #20c880}
+    .g3{background:#001020;color:#2090e0;border:1px solid #2090e0}
+    .g4{background:#1a0020;color:#c020e0;border:1px solid #c020e0}
+    .g5{background:#1a0800;color:#ff6600;border:1px solid #ff6600}
+    .bar-wrap{background:#1a1200;border-radius:4px;height:5px;width:80px;overflow:hidden;display:inline-block}
+    .bar{height:100%;background:linear-gradient(90deg,#c88600,#ffe066);border-radius:4px}
+    /* PAR GRADE */
+    .grade-section{margin-bottom:24px}
+    .grade-header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#0e0900;border:1px solid #2a1a00;border-radius:8px 8px 0 0;border-bottom:none}
+    .grade-header h3{font-family:'Cinzel',serif;font-size:.9rem;letter-spacing:2px}
+    .grade-count{font-size:.8rem;color:#7a6a40}
+    .grade-members{background:#080600;border:1px solid #1e1400;border-radius:0 0 8px 8px;padding:12px 16px}
+    .grade-members .member{display:inline-flex;align-items:center;gap:8px;margin:4px 8px 4px 0;padding:4px 12px;background:#0e0900;border:1px solid #1e1400;border-radius:20px;cursor:pointer;transition:border-color .2s;font-size:.9rem}
+    .grade-members .member:hover{border-color:#c88600;color:#c88600}
+    .grade-empty{color:#3a2a00;font-size:.85rem;font-style:italic}
+    /* PROFILE MODAL */
+    .modal-overlay{display:none;position:fixed;inset:0;background:#000000cc;z-index:200;align-items:center;justify-content:center}
+    .modal-overlay.show{display:flex}
+    .modal{background:#111;border:1px solid #3a2a00;border-radius:10px;padding:32px;width:560px;max-width:95vw;max-height:85vh;overflow-y:auto}
+    .modal-close{position:absolute;top:12px;right:16px;background:none;border:none;color:#7a6a40;font-size:1.4rem;cursor:pointer}
+    .modal-close:hover{color:#c88600}
+    .profile-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;position:relative}
+    .profile-name{font-family:'Cinzel',serif;font-size:1.4rem;color:#e0c97f;letter-spacing:2px}
+    .profile-rang{color:#7a6a40;font-size:.85rem;letter-spacing:1px;margin-top:4px}
+    .profile-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:24px}
+    .pstat{background:#0a0600;border:1px solid #1e1400;border-radius:6px;padding:12px;text-align:center}
+    .pstat .val{font-family:'Cinzel',serif;font-size:1.5rem;color:#c88600}
+    .pstat .lbl{font-size:.72rem;color:#7a6a40;letter-spacing:1px;margin-top:2px}
+    .profile-history{margin-top:8px}
+    .profile-history h4{font-family:'Cinzel',serif;font-size:.8rem;letter-spacing:2px;color:#c88600;margin-bottom:10px}
+    .hist-item{display:flex;align-items:center;gap:10px;padding:7px 10px;border-bottom:1px solid #1a1200;font-size:.85rem}
+    .hist-item:last-child{border-bottom:none}
+    .hist-rank{font-weight:700;color:#c88600;min-width:20px}
+    .hist-date{color:#4a3a20;font-size:.75rem;margin-left:auto}
+    .hist-ok{color:#20c880}.hist-fail{color:#e04040}
+    /* ADMIN */
+    #admin-panel{display:none;margin-top:28px;background:#0e0900;border:1px solid #3a2a00;border-radius:10px;padding:24px}
+    #admin-panel.show{display:block}
+    #admin-panel>h2{font-family:'Cinzel',serif;color:#c88600;letter-spacing:2px;margin-bottom:18px;font-size:1rem}
+    .admin-tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid #2a1a00}
+    .admin-tab{background:none;border:none;color:#7a6a40;padding:8px 16px;font-family:'Rajdhani',sans-serif;font-size:.9rem;letter-spacing:1px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s}
+    .admin-tab.active{color:#c88600;border-bottom-color:#c88600}
+    .admin-tab:hover{color:#e0c97f}
+    .admin-section{display:none}.admin-section.active{display:block}
+    .form-row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-top:14px}
+    .form-group{display:flex;flex-direction:column;gap:5px}
+    .form-group label{font-size:.75rem;color:#7a6a40;letter-spacing:1px}
+    .form-group select,.form-group input{background:#0a0a0a;border:1px solid #3a2a00;color:#e0c97f;padding:8px 12px;font-family:'Rajdhani',sans-serif;font-size:.9rem;border-radius:4px;min-width:130px}
+    .form-group select:focus,.form-group input:focus{outline:none;border-color:#c88600}
+    #ninja-checkboxes{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:6px;margin-bottom:12px;max-height:200px;overflow-y:auto;padding:8px;background:#0a0a0a;border:1px solid #1e1400;border-radius:6px}
+    .ninja-check{display:flex;align-items:center;gap:7px;cursor:pointer;padding:4px 6px;border-radius:4px;transition:background .15s;font-size:.88rem}
+    .ninja-check:hover{background:#1a1200}
+    .ninja-check input[type=checkbox]{accent-color:#c88600}
+    .sel-controls{display:flex;gap:8px;margin-bottom:8px}
+    .sel-controls button{background:none;border:1px solid #2a1a00;color:#7a6a40;padding:3px 10px;font-family:'Rajdhani',sans-serif;font-size:.78rem;border-radius:4px;cursor:pointer}
+    .sel-controls button:hover{border-color:#c88600;color:#c88600}
+    .btn{background:#c88600;color:#000;border:none;padding:9px 22px;font-family:'Cinzel',serif;font-size:.85rem;letter-spacing:1px;border-radius:4px;cursor:pointer;transition:background .2s}
+    .btn:hover{background:#ffe066}
+    .btn-sm{padding:7px 18px;font-size:.8rem}
+    /* HISTORY LOG */
+    .log-item{padding:10px 14px;border-bottom:1px solid #1a1200;font-size:.88rem}
+    .log-item:last-child{border-bottom:none}
+    .log-date{color:#4a3a20;font-size:.75rem;margin-bottom:3px}
+    .log-mission{color:#c88600}.log-sanction{color:#e04040}.log-add{color:#20c880}
+    .log-empty{color:#3a2a00;font-style:italic;padding:20px;text-align:center}
+    /* STATUS */
+    #status-msg{margin-top:10px;font-size:.85rem;display:none}
+    #status-msg.ok{color:#20c880;display:block}
+    #status-msg.err{color:#e04040;display:block}
+    /* LOGIN */
+    #login-overlay{display:none;position:fixed;inset:0;background:#000000cc;z-index:100;align-items:center;justify-content:center}
+    #login-overlay.show{display:flex}
+    .login-box{background:#111;border:1px solid #3a2a00;border-radius:10px;padding:36px;width:320px;text-align:center}
+    .login-box h2{font-family:'Cinzel',serif;color:#c88600;margin-bottom:22px;letter-spacing:2px;font-size:1rem}
+    .login-box input{width:100%;background:#0a0a0a;border:1px solid #3a2a00;color:#e0c97f;padding:9px 13px;font-family:'Rajdhani',sans-serif;font-size:1rem;border-radius:4px;margin-bottom:10px}
+    .login-box input:focus{outline:none;border-color:#c88600}
+    #login-error{color:#e04040;font-size:.82rem;margin-top:6px;display:none}
+    .loading{text-align:center;padding:50px;color:#3a2a00;font-family:'Cinzel',serif;letter-spacing:2px}
+    footer{text-align:center;padding:16px;color:#1e1200;font-size:.72rem;letter-spacing:1px}
   </style>
 </head>
 <body>
-
 <header>
   <h1>BUREAU DES MISSIONS SUNA</h1>
   <p>SUNAGAKURE — REGISTRE DES MÉRITES</p>
@@ -260,23 +133,37 @@
     <div class="stat"><div class="number" id="stat-top">—</div><div class="label">MEILLEUR NINJA</div></div>
   </div>
 
-  <div id="table-container"><div class="loading">CHARGEMENT...</div></div>
+  <div class="search-wrap">
+    <input type="text" id="search-input" placeholder="Rechercher un ninja..." oninput="onSearch()">
+  </div>
 
-  <!-- Admin panel -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('classement',this)">CLASSEMENT</button>
+    <button class="tab-btn" onclick="switchTab('grade',this)">PAR GRADE</button>
+  </div>
+
+  <div id="tab-classement"><div class="loading">CHARGEMENT...</div></div>
+  <div id="tab-grade" style="display:none"><div class="loading">CHARGEMENT...</div></div>
+
+  <!-- ADMIN PANEL -->
   <div id="admin-panel">
     <h2>⚙ PANNEAU D'ADMINISTRATION</h2>
+    <div class="admin-tabs">
+      <button class="admin-tab active" onclick="switchAdminTab('mission',this)">MISSION</button>
+      <button class="admin-tab" onclick="switchAdminTab('sanction',this)">SANCTION</button>
+      <button class="admin-tab" onclick="switchAdminTab('ajouter',this)">AJOUTER</button>
+      <button class="admin-tab" onclick="switchAdminTab('historique',this)">HISTORIQUE</button>
+    </div>
 
-    <!-- Ajouter une mission -->
-    <div class="admin-section">
-      <h3>ENREGISTRER UNE MISSION</h3>
-      <div class="select-controls">
+    <!-- Mission -->
+    <div id="admin-mission" class="admin-section active">
+      <div class="sel-controls">
         <button onclick="selectAll()">Tout sélectionner</button>
-        <button onclick="deselectAll()">Tout déselectionner</button>
+        <button onclick="deselectAll()">Tout désélectionner</button>
       </div>
       <div id="ninja-checkboxes"></div>
       <div class="form-row">
-        <div class="form-group">
-          <label>RANG</label>
+        <div class="form-group"><label>RANG</label>
           <select id="mission-rank">
             <option value="D">Rang D — 20 pts</option>
             <option value="C">Rang C — 40 pts</option>
@@ -285,8 +172,7 @@
             <option value="S">Rang S — 100 pts</option>
           </select>
         </div>
-        <div class="form-group">
-          <label>RÉSULTAT</label>
+        <div class="form-group"><label>RÉSULTAT</label>
           <select id="mission-result">
             <option value="success">Succès ✓</option>
             <option value="fail">Échec (0 pts, mission comptée)</option>
@@ -297,15 +183,10 @@
     </div>
 
     <!-- Sanction -->
-    <div class="admin-section">
-      <h3>APPLIQUER UNE SANCTION</h3>
+    <div id="admin-sanction" class="admin-section">
       <div class="form-row">
-        <div class="form-group">
-          <label>NINJA</label>
-          <select id="sanction-ninja"></select>
-        </div>
-        <div class="form-group">
-          <label>TYPE</label>
+        <div class="form-group"><label>NINJA</label><select id="sanction-ninja"></select></div>
+        <div class="form-group"><label>TYPE</label>
           <select id="sanction-type">
             <option value="-50">Abandon injustifié (−50 pts)</option>
             <option value="-10">Rapport non remis (−10 pts)</option>
@@ -315,16 +196,48 @@
       </div>
     </div>
 
-    <!-- Ajouter un ninja -->
-    <div class="admin-section">
-      <h3>AJOUTER UN NINJA</h3>
+    <!-- Ajouter -->
+    <div id="admin-ajouter" class="admin-section">
       <div class="form-row">
-        <div class="form-group">
-          <label>NOM COMPLET</label>
-          <input type="text" id="new-ninja-name" placeholder="Prénom Nom">
+        <div class="form-group"><label>NOM COMPLET</label><input type="text" id="new-ninja-name" placeholder="Prénom Nom"></div>
+        <div class="form-group"><label>RANG INGAME</label>
+          <select id="new-ninja-rang">
+            <option value="">— Aucun —</option>
+            <option value="Académicien">Académicien</option>
+            <option value="Genin">Genin</option>
+            <option value="Chunin">Chunin</option>
+            <option value="Jonin">Jonin</option>
+            <option value="ANBU">ANBU</option>
+            <option value="Sannin">Sannin</option>
+            <option value="Kage">Kage</option>
+          </select>
         </div>
         <button class="btn btn-sm" onclick="addNinja()">AJOUTER</button>
       </div>
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid #1e1400">
+        <div style="font-size:.8rem;color:#7a6a40;letter-spacing:1px;margin-bottom:10px">MODIFIER LE RANG INGAME D'UN NINJA EXISTANT</div>
+        <div class="form-row">
+          <div class="form-group"><label>NINJA</label><select id="edit-ninja-name"></select></div>
+          <div class="form-group"><label>NOUVEAU RANG</label>
+            <select id="edit-ninja-rang">
+              <option value="">— Aucun —</option>
+              <option value="Académicien">Académicien</option>
+              <option value="Genin">Genin</option>
+              <option value="Chunin">Chunin</option>
+              <option value="Jonin">Jonin</option>
+              <option value="ANBU">ANBU</option>
+              <option value="Sannin">Sannin</option>
+              <option value="Kage">Kage</option>
+            </select>
+          </div>
+          <button class="btn btn-sm" onclick="editRang()">MODIFIER</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historique -->
+    <div id="admin-historique" class="admin-section">
+      <div id="history-log"><div class="log-empty">Aucune action enregistrée.</div></div>
     </div>
 
     <div id="status-msg"></div>
@@ -333,200 +246,280 @@
 
 <footer>Sunagakure · Bureau des Missions · Registre des Mérites</footer>
 
-<!-- Login overlay -->
+<!-- PROFILE MODAL -->
+<div class="modal-overlay" id="profile-overlay" onclick="closeProfile(event)">
+  <div class="modal" id="profile-modal">
+    <div class="profile-header">
+      <div>
+        <div class="profile-name" id="p-name">—</div>
+        <div class="profile-rang" id="p-rang"></div>
+        <div style="margin-top:6px" id="p-grade-badge"></div>
+      </div>
+      <button class="modal-close" onclick="closeProfileBtn()">✕</button>
+    </div>
+    <div class="profile-stats">
+      <div class="pstat"><div class="val" id="p-pts">—</div><div class="lbl">POINTS</div></div>
+      <div class="pstat"><div class="val" id="p-missions">—</div><div class="lbl">MISSIONS</div></div>
+      <div class="pstat"><div class="val" id="p-taux">—</div><div class="lbl">RÉUSSITE</div></div>
+    </div>
+    <div class="profile-history">
+      <h4>HISTORIQUE DES MISSIONS</h4>
+      <div id="p-history"></div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN OVERLAY -->
 <div id="login-overlay">
   <div class="login-box">
     <h2>ACCÈS ADMIN</h2>
     <input type="password" id="pwd-input" placeholder="Mot de passe" onkeydown="if(event.key==='Enter')checkPwd()">
     <div id="login-error">Mot de passe incorrect.</div>
-    <button class="btn" onclick="checkPwd()">CONNEXION</button>
-    <button class="btn btn-secondary" onclick="closeLogin()">ANNULER</button>
+    <button class="btn" onclick="checkPwd()" style="width:100%;margin-top:6px">CONNEXION</button>
+    <button class="btn" onclick="closeLogin()" style="width:100%;margin-top:8px;background:none;border:1px solid #3a2a00;color:#7a6a40">ANNULER</button>
   </div>
 </div>
 
 <script>
-  const BIN_ID    = "6a25ba56da38895dfe9605d8";
-  const MASTER_KEY = "$2a$10$td3NtBvwk1q0e.cArx/UYeT6EvNg227oRjuO7fjPZRRiP/eQXPIm2";
-  const PASSWORD  = "bdmsunaleboss";
-  const RANK_PTS  = { D: 20, C: 40, B: 60, A: 80, S: 100 };
+const BIN_ID="6a25ba56da38895dfe9605d8";
+const MASTER_KEY="$2a$10$td3NtBvwk1q0e.cArx/UYeT6EvNg227oRjuO7fjPZRRiP/eQXPIm2";
+const PASSWORD="bdmsunaleboss";
+const RANK_PTS={D:20,C:40,B:60,A:80,S:100};
+const GRADES=[
+  {min:0,max:99,label:"Aspirant du Désert",cls:"g0"},
+  {min:100,max:249,label:"Protecteur du Sable",cls:"g1"},
+  {min:250,max:499,label:"Gardien du Désert",cls:"g2"},
+  {min:500,max:749,label:"Vétéran des Dunes",cls:"g3"},
+  {min:750,max:999,label:"Héros de Sunagakure",cls:"g4"},
+  {min:1000,max:Infinity,label:"Légende du Vent",cls:"g5"}
+];
+let ninjas=[],globalHistory=[],isAdmin=false,currentTab='classement',searchVal='';
 
-  let ninjas = [];
-  let isAdmin = false;
+function getGrade(p){return GRADES.find(g=>p>=g.min&&p<=g.max)||GRADES[0];}
+function fmtDate(iso){const d=new Date(iso);return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});}
 
-  const GRADES = [
-    { min: 0,    max: 99,   label: "Aspirant du Désert",  cls: "grade-0" },
-    { min: 100,  max: 249,  label: "Protecteur du Sable", cls: "grade-1" },
-    { min: 250,  max: 499,  label: "Gardien du Désert",   cls: "grade-2" },
-    { min: 500,  max: 749,  label: "Vétéran des Dunes",   cls: "grade-3" },
-    { min: 750,  max: 999,  label: "Héros de Sunagakure", cls: "grade-4" },
-    { min: 1000, max: Infinity, label: "Légende du Vent", cls: "grade-5" },
-  ];
+async function loadData(){
+  const r=await fetch("https://api.jsonbin.io/v3/b/"+BIN_ID+"/latest",{headers:{"X-Master-Key":MASTER_KEY}});
+  const j=await r.json();
+  ninjas=(j.record.ninjas||[]).map(n=>({history:[],rang:'',successCount:0,...n}));
+  globalHistory=j.record.globalHistory||[];
+  render();
+}
+async function saveData(){
+  const r=await fetch("https://api.jsonbin.io/v3/b/"+BIN_ID,{method:"PUT",headers:{"Content-Type":"application/json","X-Master-Key":MASTER_KEY},body:JSON.stringify({ninjas,globalHistory})});
+  return r.ok;
+}
 
-  function getGrade(pts) {
-    return GRADES.find(g => pts >= g.min && pts <= g.max) || GRADES[0];
-  }
+function render(){
+  const sorted=[...ninjas].sort((a,b)=>b.points-a.points||b.missions-a.missions);
+  const tot=ninjas.reduce((s,n)=>s+n.missions,0);
+  const top=sorted[0];
+  document.getElementById('stat-ninja').textContent=ninjas.length;
+  document.getElementById('stat-missions').textContent=tot;
+  document.getElementById('stat-top').textContent=top?top.name.split(' ')[0].toUpperCase():'—';
+  renderClassement(sorted);
+  renderGrade(sorted);
+  if(isAdmin){renderAdminLists(sorted);renderHistory();}
+}
 
-  async function loadData() {
-    const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-      headers: { "X-Master-Key": MASTER_KEY }
-    });
-    const j = await r.json();
-    ninjas = j.record.ninjas;
+function renderClassement(sorted){
+  const q=searchVal.toLowerCase();
+  const filtered=q?sorted.filter(n=>n.name.toLowerCase().includes(q)):sorted;
+  const mx=sorted[0]?Math.max(sorted[0].points,1):1;
+  if(!filtered.length){document.getElementById('tab-classement').innerHTML='<div class="loading">Aucun ninja trouvé.</div>';return;}
+  const rows=filtered.map((n,i)=>{
+    const g=getGrade(n.points);
+    const rank=sorted.indexOf(n)+1;
+    const p=Math.round(n.points/mx*100);
+    return `<tr onclick="openProfile('${n.name}')">
+      <td class="rank-num">${rank}</td>
+      <td>${n.name}</td>
+      <td>${n.rang||'<span style="color:#3a2a00">—</span>'}</td>
+      <td>${n.missions}</td>
+      <td>${n.points}</td>
+      <td><div class="bar-wrap"><div class="bar" style="width:${p}%"></div></div></td>
+      <td><span class="grade-badge ${g.cls}">${g.label}</span></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('tab-classement').innerHTML=`<table><thead><tr><th>#</th><th>NINJA</th><th>RANG</th><th>MISSIONS</th><th>POINTS</th><th></th><th>GRADE BDM</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function renderGrade(sorted){
+  const q=searchVal.toLowerCase();
+  const filtered=q?sorted.filter(n=>n.name.toLowerCase().includes(q)):sorted;
+  const html=GRADES.slice().reverse().map(g=>{
+    const members=filtered.filter(n=>getGrade(n.points).label===g.label);
+    const chips=members.length
+      ?members.map(n=>`<span class="member" onclick="openProfile('${n.name}')">${n.name}<span class="grade-badge ${g.cls}" style="font-size:.65rem">${n.points}pts</span></span>`).join('')
+      :`<span class="grade-empty">Aucun ninja dans ce grade</span>`;
+    return `<div class="grade-section">
+      <div class="grade-header"><h3 class="grade-badge ${g.cls}" style="font-size:.85rem">${g.label}</h3><span class="grade-count">${members.length} ninja${members.length>1?'s':''}</span></div>
+      <div class="grade-members">${chips}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('tab-grade').innerHTML=html;
+}
+
+function renderAdminLists(sorted){
+  // Checkboxes
+  const cb=document.getElementById('ninja-checkboxes');
+  if(cb)cb.innerHTML=sorted.map(n=>`<label class="ninja-check"><input type="checkbox" value="${n.name}"><span>${n.name}</span></label>`).join('');
+  // Sanction select
+  const ss=document.getElementById('sanction-ninja');
+  if(ss)ss.innerHTML=sorted.map(n=>`<option value="${n.name}">${n.name}</option>`).join('');
+  // Edit rang select
+  const es=document.getElementById('edit-ninja-name');
+  if(es)es.innerHTML=sorted.map(n=>`<option value="${n.name}">${n.name} (${n.rang||'—'})</option>`).join('');
+}
+
+function renderHistory(){
+  const el=document.getElementById('history-log');
+  if(!el)return;
+  if(!globalHistory.length){el.innerHTML='<div class="log-empty">Aucune action enregistrée.</div>';return;}
+  el.innerHTML=[...globalHistory].reverse().map(h=>{
+    if(h.type==='mission'){
+      const res=h.result==='success'?'<span class="hist-ok">Succès</span>':'<span class="hist-fail">Échec</span>';
+      return `<div class="log-item"><div class="log-date">${fmtDate(h.date)}</div><span class="log-mission">⚔ Mission Rang ${h.rank}</span> — ${res} — +${h.pts}pts — ${h.ninjas.join(', ')}</div>`;
+    }
+    if(h.type==='sanction'){
+      return `<div class="log-item"><div class="log-date">${fmtDate(h.date)}</div><span class="log-sanction">⚠ Sanction</span> — ${h.pts}pts — ${h.ninja}</div>`;
+    }
+    if(h.type==='add'){
+      return `<div class="log-item"><div class="log-date">${fmtDate(h.date)}</div><span class="log-add">+ Ajout</span> — ${h.ninja}${h.rang?' ('+h.rang+')':''}</div>`;
+    }
+    return '';
+  }).join('');
+}
+
+/* TABS */
+function switchTab(tab,btn){
+  currentTab=tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-classement').style.display=tab==='classement'?'block':'none';
+  document.getElementById('tab-grade').style.display=tab==='grade'?'block':'none';
+}
+function switchAdminTab(tab,btn){
+  document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.admin-section').forEach(s=>s.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('admin-'+tab).classList.add('active');
+  if(tab==='historique')renderHistory();
+}
+function onSearch(){
+  searchVal=document.getElementById('search-input').value;
+  const sorted=[...ninjas].sort((a,b)=>b.points-a.points||b.missions-a.missions);
+  renderClassement(sorted);renderGrade(sorted);
+}
+
+/* PROFILE */
+function openProfile(name){
+  const n=ninjas.find(x=>x.name===name);
+  if(!n)return;
+  const g=getGrade(n.points);
+  document.getElementById('p-name').textContent=n.name;
+  document.getElementById('p-rang').textContent=n.rang?'Rang ingame : '+n.rang:'';
+  document.getElementById('p-grade-badge').innerHTML=`<span class="grade-badge ${g.cls}">${g.label}</span>`;
+  document.getElementById('p-pts').textContent=n.points;
+  document.getElementById('p-missions').textContent=n.missions;
+  const taux=n.missions>0?Math.round((n.successCount||0)/n.missions*100)+'%':'—';
+  document.getElementById('p-taux').textContent=taux;
+  const hist=(n.history||[]);
+  document.getElementById('p-history').innerHTML=hist.length
+    ?[...hist].reverse().map(h=>`<div class="hist-item">
+        <span class="hist-rank">${h.rank}</span>
+        <span>${h.result==='success'?'<span class="hist-ok">Succès</span>':'<span class="hist-fail">Échec</span>'}</span>
+        <span style="color:#c88600">+${h.pts}pts</span>
+        <span class="hist-date">${fmtDate(h.date)}</span>
+      </div>`).join('')
+    :'<div style="color:#3a2a00;font-style:italic;padding:12px 0">Aucune mission enregistrée.</div>';
+  document.getElementById('profile-overlay').classList.add('show');
+}
+function closeProfile(e){if(e.target===document.getElementById('profile-overlay'))closeProfileBtn();}
+function closeProfileBtn(){document.getElementById('profile-overlay').classList.remove('show');}
+
+/* ADMIN ACTIONS */
+function showStatus(msg,ok){const el=document.getElementById('status-msg');el.textContent=msg;el.className=ok?'ok':'err';setTimeout(()=>{el.className='';el.style.display='none';},4000);}
+
+async function submitMission(){
+  const checked=[...document.querySelectorAll('#ninja-checkboxes input:checked')].map(c=>c.value);
+  if(!checked.length){showStatus('Sélectionne au moins un ninja.',false);return;}
+  const rank=document.getElementById('mission-rank').value;
+  const result=document.getElementById('mission-result').value;
+  const pts=result==='success'?RANK_PTS[rank]:0;
+  const now=new Date().toISOString();
+  checked.forEach(name=>{
+    const n=ninjas.find(x=>x.name===name);
+    if(!n)return;
+    n.missions+=1;
+    n.points+=pts;
+    if(result==='success')n.successCount=(n.successCount||0)+1;
+    if(!n.history)n.history=[];
+    n.history.push({date:now,rank,result,pts});
+  });
+  globalHistory.push({type:'mission',date:now,rank,result,pts,ninjas:checked});
+  const ok=await saveData();
+  if(ok){render();deselectAll();showStatus(`Mission Rang ${rank} — ${checked.length} ninja(s) — +${pts}pts.`,true);}
+  else showStatus('Erreur lors de la sauvegarde.',false);
+}
+
+async function submitSanction(){
+  const name=document.getElementById('sanction-ninja').value;
+  const pts=parseInt(document.getElementById('sanction-type').value);
+  const n=ninjas.find(x=>x.name===name);if(!n)return;
+  n.points=Math.max(0,n.points+pts);
+  const now=new Date().toISOString();
+  globalHistory.push({type:'sanction',date:now,ninja:name,pts});
+  const ok=await saveData();
+  if(ok){render();showStatus(`Sanction appliquée à ${name} (${pts}pts).`,true);}
+  else showStatus('Erreur lors de la sauvegarde.',false);
+}
+
+async function addNinja(){
+  const name=document.getElementById('new-ninja-name').value.trim();
+  const rang=document.getElementById('new-ninja-rang').value;
+  if(!name){showStatus('Entre un nom.',false);return;}
+  if(ninjas.find(n=>n.name.toLowerCase()===name.toLowerCase())){showStatus('Ce ninja existe déjà.',false);return;}
+  ninjas.push({name,rang,missions:0,points:0,successCount:0,history:[]});
+  globalHistory.push({type:'add',date:new Date().toISOString(),ninja:name,rang});
+  const ok=await saveData();
+  if(ok){document.getElementById('new-ninja-name').value='';render();showStatus(name+' ajouté au registre.',true);}
+  else showStatus('Erreur lors de la sauvegarde.',false);
+}
+
+async function editRang(){
+  const name=document.getElementById('edit-ninja-name').value;
+  const rang=document.getElementById('edit-ninja-rang').value;
+  const n=ninjas.find(x=>x.name===name);if(!n)return;
+  n.rang=rang;
+  const ok=await saveData();
+  if(ok){render();showStatus(`Rang de ${name} mis à jour : ${rang||'—'}.`,true);}
+  else showStatus('Erreur lors de la sauvegarde.',false);
+}
+
+function selectAll(){document.querySelectorAll('#ninja-checkboxes input').forEach(c=>c.checked=true);}
+function deselectAll(){document.querySelectorAll('#ninja-checkboxes input').forEach(c=>c.checked=false);}
+
+/* LOGIN */
+function toggleLogin(){if(isAdmin){logoutAdmin();return;}document.getElementById('login-overlay').classList.add('show');setTimeout(()=>document.getElementById('pwd-input').focus(),100);}
+function closeLogin(){document.getElementById('login-overlay').classList.remove('show');document.getElementById('login-error').style.display='none';document.getElementById('pwd-input').value='';}
+function checkPwd(){
+  if(document.getElementById('pwd-input').value===PASSWORD){
+    isAdmin=true;closeLogin();
+    document.getElementById('admin-panel').classList.add('show');
+    document.getElementById('login-btn').classList.add('active');
+    document.getElementById('login-btn').textContent='⚙ DÉCONNEXION';
     render();
-  }
+  }else{document.getElementById('login-error').style.display='block';document.getElementById('pwd-input').value='';}
+}
+function logoutAdmin(){
+  isAdmin=false;
+  document.getElementById('admin-panel').classList.remove('show');
+  document.getElementById('login-btn').classList.remove('active');
+  document.getElementById('login-btn').textContent='⚙ ADMIN';
+}
 
-  async function saveData() {
-    const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
-      body: JSON.stringify({ ninjas })
-    });
-    return r.ok;
-  }
-
-  function render() {
-    const sorted = [...ninjas].sort((a, b) => b.points - a.points || b.missions - a.missions);
-    const totalMissions = ninjas.reduce((s, n) => s + n.missions, 0);
-    const top = sorted[0];
-
-    document.getElementById('stat-ninja').textContent = ninjas.length;
-    document.getElementById('stat-missions').textContent = totalMissions;
-    document.getElementById('stat-top').textContent = top ? top.name.split(' ')[0].toUpperCase() : '—';
-
-    const maxPts = top ? Math.max(top.points, 1) : 1;
-
-    const rows = sorted.map((n, i) => {
-      const g = getGrade(n.points);
-      const pct = Math.round((n.points / maxPts) * 100);
-      return `<tr>
-        <td class="rank-num">${i + 1}</td>
-        <td>${n.name}</td>
-        <td>${n.missions}</td>
-        <td>${n.points}</td>
-        <td><div class="bar-wrap"><div class="bar" style="width:${pct}%"></div></div></td>
-        <td><span class="grade-badge ${g.cls}">${g.label}</span></td>
-      </tr>`;
-    }).join('');
-
-    document.getElementById('table-container').innerHTML = `
-      <table>
-        <thead><tr>
-          <th>#</th><th>NINJA</th><th>MISSIONS</th><th>POINTS</th><th></th><th>GRADE</th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table>`;
-
-    // Remplir les selects admin
-    const checksDiv = document.getElementById('ninja-checkboxes');
-    if (checksDiv) {
-      checksDiv.innerHTML = sorted.map(n =>
-        `<label class="ninja-check">
-          <input type="checkbox" value="${n.name}">
-          <span>${n.name}</span>
-        </label>`
-      ).join('');
-    }
-
-    const sanctionSel = document.getElementById('sanction-ninja');
-    if (sanctionSel) {
-      sanctionSel.innerHTML = sorted.map(n =>
-        `<option value="${n.name}">${n.name}</option>`
-      ).join('');
-    }
-  }
-
-  function showStatus(msg, ok) {
-    const el = document.getElementById('status-msg');
-    el.textContent = msg;
-    el.className = ok ? 'ok' : 'err';
-    setTimeout(() => { el.className = ''; }, 4000);
-  }
-
-  async function submitMission() {
-    const checked = [...document.querySelectorAll('#ninja-checkboxes input:checked')].map(c => c.value);
-    if (!checked.length) { showStatus('Sélectionne au moins un ninja.', false); return; }
-    const rank = document.getElementById('mission-rank').value;
-    const result = document.getElementById('mission-result').value;
-    const pts = result === 'success' ? RANK_PTS[rank] : 0;
-
-    checked.forEach(name => {
-      const n = ninjas.find(x => x.name === name);
-      if (n) { n.missions += 1; n.points += pts; }
-    });
-
-    const ok = await saveData();
-    if (ok) { render(); showStatus(`Mission Rang ${rank} enregistrée pour ${checked.length} ninja(s) — +${pts} pts chacun.`, true); }
-    else showStatus('Erreur lors de la sauvegarde.', false);
-  }
-
-  async function submitSanction() {
-    const name = document.getElementById('sanction-ninja').value;
-    const pts = parseInt(document.getElementById('sanction-type').value);
-    const n = ninjas.find(x => x.name === name);
-    if (!n) return;
-    n.points = Math.max(0, n.points + pts);
-    const ok = await saveData();
-    if (ok) { render(); showStatus(`Sanction appliquée à ${name} (${pts} pts).`, true); }
-    else showStatus('Erreur lors de la sauvegarde.', false);
-  }
-
-  async function addNinja() {
-    const name = document.getElementById('new-ninja-name').value.trim();
-    if (!name) { showStatus('Entre un nom.', false); return; }
-    if (ninjas.find(n => n.name.toLowerCase() === name.toLowerCase())) {
-      showStatus('Ce ninja existe déjà.', false); return;
-    }
-    ninjas.push({ name, missions: 0, points: 0 });
-    const ok = await saveData();
-    if (ok) {
-      document.getElementById('new-ninja-name').value = '';
-      render();
-      showStatus(`${name} ajouté au registre.`, true);
-    } else showStatus('Erreur lors de la sauvegarde.', false);
-  }
-
-  function toggleLogin() {
-    if (isAdmin) { logoutAdmin(); return; }
-    document.getElementById('login-overlay').classList.add('show');
-    setTimeout(() => document.getElementById('pwd-input').focus(), 100);
-  }
-
-  function closeLogin() {
-    document.getElementById('login-overlay').classList.remove('show');
-    document.getElementById('login-error').style.display = 'none';
-    document.getElementById('pwd-input').value = '';
-  }
-
-  function checkPwd() {
-    const pwd = document.getElementById('pwd-input').value;
-    if (pwd === PASSWORD) {
-      isAdmin = true;
-      closeLogin();
-      document.getElementById('admin-panel').classList.add('show');
-      document.getElementById('login-btn').classList.add('active');
-      document.getElementById('login-btn').textContent = '⚙ DÉCONNEXION';
-    } else {
-      document.getElementById('login-error').style.display = 'block';
-      document.getElementById('pwd-input').value = '';
-    }
-  }
-
-  function logoutAdmin() {
-    isAdmin = false;
-    document.getElementById('admin-panel').classList.remove('show');
-    document.getElementById('login-btn').classList.remove('active');
-    document.getElementById('login-btn').textContent = '⚙ ADMIN';
-  }
-
-  function selectAll() {
-    document.querySelectorAll('#ninja-checkboxes input').forEach(c => c.checked = true);
-  }
-
-  function deselectAll() {
-    document.querySelectorAll('#ninja-checkboxes input').forEach(c => c.checked = false);
-  }
-
-  loadData();
+loadData();
 </script>
 </body>
 </html>
