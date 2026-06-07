@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Naruto RP — Suivi des Missions</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Rajdhani:wght@400;600&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background-color: #0d0d0d;
+      color: #e0c97f;
+      font-family: 'Rajdhani', sans-serif;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse at top, #1a0a00 0%, #0d0d0d 60%);
+    }
+
+    header {
+      text-align: center;
+      padding: 50px 20px 30px;
+      border-bottom: 1px solid #3a2a00;
+    }
+
+    header h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 2.4rem;
+      color: #e0c97f;
+      letter-spacing: 4px;
+      text-shadow: 0 0 20px #c8860080;
+    }
+
+    header p {
+      color: #7a6a40;
+      margin-top: 8px;
+      font-size: 1rem;
+      letter-spacing: 2px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-bottom: 40px;
+      padding: 20px;
+      background: #111;
+      border: 1px solid #2a1a00;
+      border-radius: 8px;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat .number {
+      font-family: 'Cinzel', serif;
+      font-size: 2rem;
+      color: #c88600;
+    }
+
+    .stat .label {
+      font-size: 0.85rem;
+      color: #7a6a40;
+      letter-spacing: 1px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead tr {
+      background: #1a0f00;
+      border-bottom: 2px solid #c88600;
+    }
+
+    thead th {
+      padding: 14px 20px;
+      text-align: left;
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      color: #c88600;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #1e1400;
+      transition: background 0.2s;
+    }
+
+    tbody tr:hover {
+      background: #1a1000;
+    }
+
+    tbody td {
+      padding: 14px 20px;
+      font-size: 1.05rem;
+    }
+
+    .rank {
+      font-weight: 600;
+      color: #c88600;
+      font-size: 1.1rem;
+    }
+
+    .missions-count {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+    }
+
+    .bar-wrap {
+      background: #1e1400;
+      border-radius: 4px;
+      height: 6px;
+      width: 120px;
+      overflow: hidden;
+    }
+
+    .bar {
+      height: 100%;
+      background: linear-gradient(90deg, #c88600, #ffe066);
+      border-radius: 4px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: #3a2a00;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>NARUTO RP</h1>
+  <p>BUREAU DES MISSIONS — SUIVI DES PARTICIPATIONS</p>
+</header>
+
+<div class="container">
+
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="number" id="total-ninja">0</div>
+      <div class="label">NINJA ENREGISTRÉS</div>
+    </div>
+    <div class="stat">
+      <div class="number" id="total-missions">0</div>
+      <div class="label">PARTICIPATIONS TOTALES</div>
+    </div>
+    <div class="stat">
+      <div class="number" id="top-ninja">—</div>
+      <div class="label">NINJA LE + ACTIF</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>NINJA</th>
+        <th>MISSIONS</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="table-body">
+    </tbody>
+  </table>
+
+</div>
+
+<footer>Sunagakure — Bureau des Missions · Dernière mise à jour : 07/06/2026</footer>
+
+<script>
+  const ninjas = [
+    { name: "Azashiro Kashin",   missions: 1 },
+    { name: "Glaz Ayano",        missions: 1 },
+    { name: "Hen Kurogane",      missions: 1 },
+    { name: "Isan Chigusa",      missions: 1 },
+    { name: "Kagetora Shijubu",  missions: 1 },
+    { name: "Kaitsuro Renshido", missions: 1 },
+    { name: "Kazegan Douma",     missions: 1 },
+    { name: "Kenshin Yamato",    missions: 1 },
+    { name: "Kintoki Kushiki",   missions: 1 },
+    { name: "Kitsuki Kagomo",    missions: 1 },
+    { name: "Lior Hanazora",     missions: 1 },
+    { name: "Renji Takeda",      missions: 1 },
+    { name: "Roa Shirogane",     missions: 1 },
+    { name: "Senko Kagemi",      missions: 1 },
+    { name: "Seto Ran",          missions: 1 },
+    { name: "Shin Ryomen",       missions: 1 },
+    { name: "Shiryu Kowasu",     missions: 1 },
+    { name: "Sunao Shirogane",   missions: 1 },
+    { name: "Yowato Bonzai",     missions: 1 },
+    { name: "Zagariyo Kitsonu",  missions: 1 },
+    { name: "Zohia Noniga",      missions: 1 },
+  ];
+
+  const sorted = [...ninjas].sort((a, b) => b.missions - a.missions);
+  const max = sorted[0].missions;
+
+  document.getElementById('total-ninja').textContent = ninjas.length;
+  document.getElementById('total-missions').textContent = ninjas.reduce((s, n) => s + n.missions, 0);
+  document.getElementById('top-ninja').textContent = sorted[0].name.split(' ')[0].toUpperCase();
+
+  const tbody = document.getElementById('table-body');
+  sorted.forEach((ninja, i) => {
+    const pct = Math.round((ninja.missions / max) * 100);
+    tbody.innerHTML += `
+      <tr>
+        <td class="rank">${i + 1}</td>
+        <td>${ninja.name}</td>
+        <td class="missions-count">${ninja.missions}</td>
+        <td><div class="bar-wrap"><div class="bar" style="width:${pct}%"></div></div></td>
+      </tr>`;
+  });
+</script>
+
+</body>
+</html>
