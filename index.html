@@ -42,7 +42,7 @@
     .bar{height:100%;border-radius:4px}
     .bar-gold{background:linear-gradient(90deg,#c88600,#ffe066)}
     .bar-week{background:linear-gradient(90deg,#2090e0,#80d0ff)}
-    /* SEMAINE */
+    /* ANNÉE */
     .week-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:10px 14px;background:#0a0d14;border:1px solid #1a2a40;border-radius:6px}
     .week-reset-info{font-size:.8rem;color:#4a6a90;letter-spacing:1px}
     .week-crown{font-size:1.1rem}
@@ -72,17 +72,17 @@
     .hist-rank{font-weight:700;color:#c88600;min-width:20px}
     .hist-date{color:#4a3a20;font-size:.72rem;margin-left:auto}
     .hist-ok{color:#20c880}.hist-fail{color:#e04040}
-    /* ADMIN */
-    #admin-panel{display:none;margin-top:28px;background:#0e0900;border:1px solid #3a2a00;border-radius:10px;padding:22px}
-    #admin-panel.show{display:block}
-    .admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-    .admin-header h2{font-family:'Cinzel',serif;color:#c88600;letter-spacing:2px;font-size:1rem}
-    .admin-who{font-size:.8rem;color:#7a6a40;letter-spacing:1px}
-    .admin-tabs{display:flex;gap:0;margin-bottom:18px;border-bottom:1px solid #2a1a00}
-    .admin-tab{background:none;border:none;color:#7a6a40;padding:7px 14px;font-family:'Rajdhani',sans-serif;font-size:.88rem;letter-spacing:1px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s}
-    .admin-tab.active{color:#c88600;border-bottom-color:#c88600}
-    .admin-tab:hover{color:#e0c97f}
-    .admin-section{display:none}.admin-section.active{display:block}
+    /* GÉRANT */
+    #gerant-panel{display:none;margin-top:28px;background:#0e0900;border:1px solid #3a2a00;border-radius:10px;padding:22px}
+    #gerant-panel.show{display:block}
+    .gerant-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .gerant-header h2{font-family:'Cinzel',serif;color:#c88600;letter-spacing:2px;font-size:1rem}
+    .gerant-who{font-size:.8rem;color:#7a6a40;letter-spacing:1px}
+    .gerant-tabs{display:flex;gap:0;margin-bottom:18px;border-bottom:1px solid #2a1a00}
+    .gerant-tab{background:none;border:none;color:#7a6a40;padding:7px 14px;font-family:'Rajdhani',sans-serif;font-size:.88rem;letter-spacing:1px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s}
+    .gerant-tab.active{color:#c88600;border-bottom-color:#c88600}
+    .gerant-tab:hover{color:#e0c97f}
+    .gerant-section{display:none}.gerant-section.active{display:block}
     .form-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-top:12px}
     .form-group{display:flex;flex-direction:column;gap:4px}
     .form-group label{font-size:.72rem;color:#7a6a40;letter-spacing:1px}
@@ -138,7 +138,7 @@
 <header>
   <h1>BUREAU DES MISSIONS SUNA</h1>
   <p>SUNAGAKURE — REGISTRE DES MÉRITES</p>
-  <button id="login-btn" onclick="toggleLogin()">⚙ ADMIN</button>
+  <button id="login-btn" onclick="toggleLogin()">⚙ GÉRANT</button>
 </header>
 
 <div class="container">
@@ -154,30 +154,30 @@
 
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('classement',this)">CLASSEMENT</button>
-    <button class="tab-btn" onclick="switchTab('semaine',this)">⚡ SEMAINE</button>
+    <button class="tab-btn" onclick="switchTab('année',this)">⚡ ANNÉE</button>
     <button class="tab-btn" onclick="switchTab('grade',this)">PAR GRADE</button>
   </div>
 
   <div id="tab-classement"><div class="loading">CHARGEMENT...</div></div>
-  <div id="tab-semaine" style="display:none"><div class="loading">CHARGEMENT...</div></div>
+  <div id="tab-année" style="display:none"><div class="loading">CHARGEMENT...</div></div>
   <div id="tab-grade" style="display:none"><div class="loading">CHARGEMENT...</div></div>
 
-  <!-- ADMIN PANEL -->
-  <div id="admin-panel">
-    <div class="admin-header">
-      <h2>⚙ PANNEAU D'ADMINISTRATION</h2>
-      <span class="admin-who" id="admin-who"></span>
+  <!-- GÉRANT PANEL -->
+  <div id="gerant-panel">
+    <div class="gerant-header">
+      <h2>⚙ PANNEAU DE GESTION</h2>
+      <span class="gerant-who" id="gerant-who"></span>
     </div>
-    <div class="admin-tabs">
-      <button class="admin-tab active" onclick="switchAdminTab('mission',this)">MISSION</button>
-      <button class="admin-tab" onclick="switchAdminTab('sanction',this)">SANCTION</button>
-      <button class="admin-tab" onclick="switchAdminTab('gerer',this)">GÉRER</button>
-      <button class="admin-tab" onclick="switchAdminTab('historique',this)">HISTORIQUE</button>
-      <button class="admin-tab" onclick="switchAdminTab('stats',this)">STATS ADMINS</button>
+    <div class="gerant-tabs">
+      <button class="gerant-tab active" onclick="switchGerantTab('mission',this)">MISSION</button>
+      <button class="gerant-tab" onclick="switchGerantTab('sanction',this)">SANCTION</button>
+      <button class="gerant-tab" onclick="switchGerantTab('gerer',this)">GÉRER</button>
+      <button class="gerant-tab" onclick="switchGerantTab('historique',this)">HISTORIQUE</button>
+      <button class="gerant-tab" onclick="switchGerantTab('stats',this)">STATS GÉRANTS</button>
     </div>
 
     <!-- MISSION -->
-    <div id="admin-mission" class="admin-section active">
+    <div id="gerant-mission" class="gerant-section active">
       <div class="sel-controls">
         <button onclick="selectAll()">Tout sélectionner</button>
         <button onclick="deselectAll()">Tout désélectionner</button>
@@ -205,13 +205,15 @@
     </div>
 
     <!-- SANCTION -->
-    <div id="admin-sanction" class="admin-section">
+    <div id="gerant-sanction" class="gerant-section">
       <div class="form-row">
         <div class="form-group"><label>NINJA</label><select id="sanction-ninja"></select></div>
         <div class="form-group"><label>TYPE</label>
           <select id="sanction-type">
             <option value="-50">Abandon injustifié (−50 pts)</option>
             <option value="-10">Rapport non remis (−10 pts)</option>
+            <option value="-15">Comportement irrespectueux envers un supérieur (−15 pts)</option>
+            <option value="-15">Désobéissance aux ordres (−15 pts)</option>
           </select>
         </div>
         <button class="btn btn-sm" onclick="submitSanction()">APPLIQUER</button>
@@ -219,7 +221,7 @@
     </div>
 
     <!-- GÉRER -->
-    <div id="admin-gerer" class="admin-section">
+    <div id="gerant-gerer" class="gerant-section">
 
       <!-- Ajouter ninja -->
       <div class="section-label">AJOUTER UN NINJA</div>
@@ -271,31 +273,31 @@
 
       <hr class="sep">
 
-      <!-- Reset semaine -->
-      <div class="section-label">CLASSEMENT DE LA SEMAINE</div>
-      <div style="font-size:.82rem;color:#7a6a40;margin-bottom:10px">Réinitialise les points de la semaine pour tous les joueurs. Irréversible.</div>
-      <button class="btn btn-blue btn-sm" onclick="resetWeek()">⚡ RÉINITIALISER LA SEMAINE</button>
+      <!-- Reset année -->
+      <div class="section-label">CLASSEMENT DE LA ANNÉE</div>
+      <div style="font-size:.82rem;color:#7a6a40;margin-bottom:10px">Réinitialise les points de la année pour tous les joueurs. Irréversible.</div>
+      <button class="btn btn-blue btn-sm" onclick="resetYear()">⚡ RÉINITIALISER L'ANNÉE</button>
 
       <hr class="sep">
 
-      <!-- Gérer admins -->
-      <div class="section-label">GÉRER LES ADMINS</div>
-      <div id="admin-list" class="manage-list" style="margin-bottom:10px"></div>
+      <!-- Gérer les gérants -->
+      <div class="section-label">GÉRER LES GÉRANTS</div>
+      <div id="gerant-list" class="manage-list" style="margin-bottom:10px"></div>
       <div class="form-row">
         <div class="form-group"><label>NOM</label><input type="text" id="new-admin-name" placeholder="Pseudo ingame"></div>
         <div class="form-group"><label>MOT DE PASSE</label><input type="password" id="new-admin-pwd" placeholder="Mot de passe"></div>
-        <button class="btn btn-sm" onclick="addAdmin()">AJOUTER</button>
+        <button class="btn btn-sm" onclick="addGérant()">AJOUTER</button>
       </div>
     </div>
 
     <!-- HISTORIQUE -->
-    <div id="admin-historique" class="admin-section">
+    <div id="gerant-historique" class="gerant-section">
       <div class="log-wrap" id="history-log"><div class="log-empty">Aucune action enregistrée.</div></div>
     </div>
 
-    <!-- STATS ADMINS -->
-    <div id="admin-stats" class="admin-section">
-      <div id="admin-stats-content"></div>
+    <!-- STATS GÉRANTS -->
+    <div id="gerant-stats" class="gerant-section">
+      <div id="gerant-stats-content"></div>
     </div>
 
     <div id="status-msg"></div>
@@ -315,7 +317,7 @@
       <div class="pstat"><div class="val" id="p-pts">—</div><div class="lbl">POINTS</div></div>
       <div class="pstat"><div class="val" id="p-missions">—</div><div class="lbl">MISSIONS</div></div>
       <div class="pstat"><div class="val" id="p-taux">—</div><div class="lbl">RÉUSSITE</div></div>
-      <div class="pstat"><div class="val" id="p-week">—</div><div class="lbl">SEMAINE</div></div>
+      <div class="pstat"><div class="val" id="p-week">—</div><div class="lbl">ANNÉE</div></div>
     </div>
     <div class="profile-history">
       <h4>HISTORIQUE DES MISSIONS</h4>
@@ -327,7 +329,7 @@
 <!-- LOGIN -->
 <div id="login-overlay">
   <div class="login-box">
-    <h2>ACCÈS ADMIN</h2>
+    <h2>ACCÈS GÉRANT</h2>
     <select id="login-name"></select>
     <input type="password" id="pwd-input" placeholder="Mot de passe" onkeydown="if(event.key==='Enter')checkPwd()">
     <div id="login-error">Identifiants incorrects.</div>
@@ -350,8 +352,8 @@ const GRADES=[
   {min:1000,max:Infinity,label:"Légende du Vent",cls:"g5"}
 ];
 
-let ninjas=[],globalHistory=[],admins=[],weeklyReset=null;
-let isAdmin=false,currentAdminName='',currentTab='classement',searchVal='';
+let ninjas=[],globalHistory=[],gerants=[],yearlyReset=null;
+let isGerant=false,currentGerantName='',currentTab='classement',searchVal='';
 
 function getGrade(p){return GRADES.find(g=>p>=g.min&&p<=g.max)||GRADES[0];}
 function fmtDate(iso){const d=new Date(iso);return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}
@@ -360,21 +362,21 @@ function fmtDateShort(iso){const d=new Date(iso);return d.toLocaleDateString('fr
 async function loadData(){
   const r=await fetch("https://api.jsonbin.io/v3/b/"+BIN_ID+"/latest",{headers:{"X-Master-Key":MASTER_KEY}});
   const j=await r.json();
-  ninjas=(j.record.ninjas||[]).map(n=>({history:[],rang:'',successCount:0,weeklyPoints:0,weeklyMissions:0,...n}));
+  ninjas=(j.record.ninjas||[]).map(n=>({history:[],rang:'',successCount:0,yearlyPoints:0,yearlyMissions:0,...n}));
   globalHistory=j.record.globalHistory||[];
-  admins=j.record.admins||[{name:"Aozora",password:"aozora"},{name:"Lior",password:"lior"}];
-  weeklyReset=j.record.weeklyReset||new Date().toISOString();
+  gerants=j.record.gerants||[{name:"Aozora",password:"aozora"},{name:"Lior",password:"lior"}];
+  yearlyReset=j.record.yearlyReset||new Date().toISOString();
   populateLoginDropdown();
   render();
 }
 async function saveData(){
-  const r=await fetch("https://api.jsonbin.io/v3/b/"+BIN_ID,{method:"PUT",headers:{"Content-Type":"application/json","X-Master-Key":MASTER_KEY},body:JSON.stringify({ninjas,globalHistory,admins,weeklyReset})});
+  const r=await fetch("https://api.jsonbin.io/v3/b/"+BIN_ID,{method:"PUT",headers:{"Content-Type":"application/json","X-Master-Key":MASTER_KEY},body:JSON.stringify({ninjas,globalHistory,gerants,yearlyReset})});
   return r.ok;
 }
 
 function populateLoginDropdown(){
   const sel=document.getElementById('login-name');
-  sel.innerHTML=admins.map(a=>`<option value="${a.name}">${a.name}</option>`).join('')+'<option value="__master__">Maître du Bureau</option>';
+  sel.innerHTML=gerants.map(a=>`<option value="${a.name}">${a.name}</option>`).join('')+'<option value="__master__">Maître du Bureau</option>';
 }
 
 function render(){
@@ -385,9 +387,9 @@ function render(){
   document.getElementById('stat-missions').textContent=tot;
   document.getElementById('stat-top').textContent=top?top.name.split(' ')[0].toUpperCase():'—';
   renderClassement(sorted);
-  renderSemaine();
+  renderAnnée();
   renderGrade(sorted);
-  if(isAdmin){renderAdminLists(sorted);renderRemoveList(sorted);renderAdminList();renderHistory();}
+  if(isGerant){renderGerantLists(sorted);renderRemoveList(sorted);renderGerantList();renderHistory();}
 }
 
 function renderClassement(sorted){
@@ -410,31 +412,31 @@ function renderClassement(sorted){
   document.getElementById('tab-classement').innerHTML=`<table><thead><tr><th>#</th><th>NINJA</th><th>RANG</th><th>MISSIONS</th><th>POINTS</th><th></th><th>GRADE BDM</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
-function renderSemaine(){
+function renderAnnée(){
   const q=searchVal.toLowerCase();
-  const sorted=[...ninjas].sort((a,b)=>(b.weeklyPoints||0)-(a.weeklyPoints||0)||(b.weeklyMissions||0)-(a.weeklyMissions||0));
+  const sorted=[...ninjas].sort((a,b)=>(b.yearlyPoints||0)-(a.yearlyPoints||0)||(b.yearlyMissions||0)-(a.yearlyMissions||0));
   const filtered=q?sorted.filter(n=>n.name.toLowerCase().includes(q)):sorted;
-  const mx=sorted[0]?Math.max(sorted[0].weeklyPoints||0,1):1;
-  const resetInfo=weeklyReset?'Réinitialisé le '+fmtDateShort(weeklyReset):'';
+  const mx=sorted[0]?Math.max(sorted[0].yearlyPoints||0,1):1;
+  const resetInfo=yearlyReset?'Réinitialisé le '+fmtDateShort(yearlyReset):'';
   const rows=filtered.map((n,i)=>{
-    const p=Math.round((n.weeklyPoints||0)/mx*100);
-    const medal=i===0&&(n.weeklyPoints||0)>0?'👑 ':'';
+    const p=Math.round((n.yearlyPoints||0)/mx*100);
+    const medal=i===0&&(n.yearlyPoints||0)>0?'👑 ':'';
     return `<tr onclick="openProfile('${n.name.replace(/'/g,"\\'")}')">
       <td class="rank-num">${i+1}</td>
       <td>${medal}${n.name}</td>
       <td>${n.rang||'<span style="color:#3a2a00">—</span>'}</td>
-      <td>${n.weeklyMissions||0}</td>
-      <td style="color:#2090e0;font-weight:600">${n.weeklyPoints||0}</td>
+      <td>${n.yearlyMissions||0}</td>
+      <td style="color:#2090e0;font-weight:600">${n.yearlyPoints||0}</td>
       <td><div class="bar-wrap"><div class="bar bar-week" style="width:${p}%"></div></div></td>
     </tr>`;
   }).join('');
-  const resetBtn=isAdmin?`<button class="btn btn-blue btn-sm" onclick="resetWeek()" style="white-space:nowrap">⚡ Réinitialiser</button>`:'';
-  document.getElementById('tab-semaine').innerHTML=`
+  const resetBtn=isGerant?`<button class="btn btn-blue btn-sm" onclick="resetYear()" style="white-space:nowrap">⚡ Réinitialiser</button>`:'';
+  document.getElementById('tab-année').innerHTML=`
     <div class="week-header">
-      <span class="week-reset-info">⚡ POINTS DE LA SEMAINE — ${resetInfo}</span>
+      <span class="week-reset-info">⚡ POINTS DE LA ANNÉE — ${resetInfo}</span>
       ${resetBtn}
     </div>
-    <table><thead><tr><th>#</th><th>NINJA</th><th>RANG</th><th>MISSIONS</th><th>PTS SEMAINE</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="6" style="text-align:center;color:#3a2a00;padding:20px">Aucune mission cette semaine.</td></tr>'}</tbody></table>`;
+    <table><thead><tr><th>#</th><th>NINJA</th><th>RANG</th><th>MISSIONS</th><th>PTS ANNÉE</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="6" style="text-align:center;color:#3a2a00;padding:20px">Aucune mission cette année.</td></tr>'}</tbody></table>`;
 }
 
 function renderGrade(sorted){
@@ -453,7 +455,7 @@ function renderGrade(sorted){
   document.getElementById('tab-grade').innerHTML=html;
 }
 
-function renderAdminLists(sorted){
+function renderGerantLists(sorted){
   const cb=document.getElementById('ninja-checkboxes');
   if(cb)cb.innerHTML=sorted.map(n=>`<label class="ninja-check"><input type="checkbox" value="${n.name}"><span>${n.name}</span></label>`).join('');
   const ss=document.getElementById('sanction-ninja');
@@ -472,12 +474,12 @@ function renderRemoveList(sorted){
   </div>`).join('');
 }
 
-function renderAdminList(){
-  const el=document.getElementById('admin-list');
+function renderGerantList(){
+  const el=document.getElementById('gerant-list');
   if(!el)return;
-  el.innerHTML=admins.map(a=>`<div class="manage-item">
+  el.innerHTML=gerants.map(a=>`<div class="manage-item">
     <span class="manage-item-name">${a.name}</span>
-    <button class="del-btn" onclick="removeAdmin('${a.name.replace(/'/g,"\\'")}')">Retirer</button>
+    <button class="del-btn" onclick="removeGérant('${a.name.replace(/'/g,"\\'")}')">Retirer</button>
   </div>`).join('');
 }
 
@@ -492,7 +494,7 @@ function renderHistory(){
     if(h.type==='add')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${who}</div><span class="log-add">+ Ajout ninja</span> — ${h.ninja}${h.rang?' ('+h.rang+')':''}</div>`;
     if(h.type==='remove')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${who}</div><span class="log-remove">✕ Suppression</span> — ${h.ninja}</div>`;
     if(h.type==='rang')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${who}</div><span class="log-add">✎ Rang modifié</span> — ${h.ninja} → ${h.rang||'—'}</div>`;
-    if(h.type==='week_reset')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${who}</div><span class="log-week">⚡ Réinitialisation semaine</span></div>`;
+    if(h.type==='year_reset')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${who}</div><span class="log-week">⚡ Réinitialisation année</span></div>`;
     return'';
   }).join('');
 }
@@ -502,17 +504,17 @@ function switchTab(tab,btn){
   currentTab=tab;
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  ['classement','semaine','grade'].forEach(t=>document.getElementById('tab-'+t).style.display=t===tab?'block':'none');
+  ['classement','année','grade'].forEach(t=>document.getElementById('tab-'+t).style.display=t===tab?'block':'none');
 }
-function switchAdminTab(tab,btn){
-  document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.admin-section').forEach(s=>s.classList.remove('active'));
+function switchGerantTab(tab,btn){
+  document.querySelectorAll('.gerant-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.gerant-section').forEach(s=>s.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('admin-'+tab).classList.add('active');
   if(tab==='historique')renderHistory();
-  if(tab==='stats')renderAdminStats();
+  if(tab==='stats')renderGérantStats();
 }
-function onSearch(){searchVal=document.getElementById('search-input').value;const s=[...ninjas].sort((a,b)=>b.points-a.points);renderClassement(s);renderSemaine();renderGrade(s);}
+function onSearch(){searchVal=document.getElementById('search-input').value;const s=[...ninjas].sort((a,b)=>b.points-a.points);renderClassement(s);renderAnnée();renderGrade(s);}
 
 /* PROFILE */
 function openProfile(name){
@@ -523,7 +525,7 @@ function openProfile(name){
   document.getElementById('p-grade-badge').innerHTML=`<span class="grade-badge ${g.cls}">${g.label}</span>`;
   document.getElementById('p-pts').textContent=n.points;
   document.getElementById('p-missions').textContent=n.missions;
-  document.getElementById('p-week').textContent=(n.weeklyPoints||0)+'pts';
+  document.getElementById('p-week').textContent=(n.yearlyPoints||0)+'pts';
   const taux=n.missions>0?Math.round((n.successCount||0)/n.missions*100)+'%':'—';
   document.getElementById('p-taux').textContent=taux;
   const hist=n.history||[];
@@ -553,7 +555,7 @@ function closeProfileBtn(){document.getElementById('profile-overlay').classList.
 /* STATUS */
 function showStatus(msg,ok){const el=document.getElementById('status-msg');el.textContent=msg;el.className=ok?'ok':'err';setTimeout(()=>{el.className='';},4000);}
 
-/* ADMIN ACTIONS */
+/* GÉRANT ACTIONS */
 async function submitMission(){
   const checked=[...document.querySelectorAll('#ninja-checkboxes input:checked')].map(c=>c.value);
   if(!checked.length){showStatus('Sélectionne au moins un ninja.',false);return;}
@@ -564,13 +566,13 @@ async function submitMission(){
   checked.forEach(name=>{
     const n=ninjas.find(x=>x.name===name);if(!n)return;
     n.missions+=1;n.points+=pts;
-    n.weeklyMissions=(n.weeklyMissions||0)+1;
-    n.weeklyPoints=(n.weeklyPoints||0)+pts;
+    n.yearlyMissions=(n.yearlyMissions||0)+1;
+    n.yearlyPoints=(n.yearlyPoints||0)+pts;
     if(result==='success')n.successCount=(n.successCount||0)+1;
     if(!n.history)n.history=[];
     n.history.push({date:now,rank,result,pts});
   });
-  globalHistory.push({type:'mission',date:now,rank,result,pts,ninjas:checked,by:currentAdminName});
+  globalHistory.push({type:'mission',date:now,rank,result,pts,ninjas:checked,by:currentGerantName});
   const ok=await saveData();
   if(ok){render();deselectAll();showStatus(`Rang ${rank} — ${checked.length} ninja(s) — +${pts}pts.`,true);}
   else showStatus('Erreur lors de la sauvegarde.',false);
@@ -585,7 +587,7 @@ async function submitSanction(){
   const now=new Date().toISOString();
   if(!n.history)n.history=[];
   n.history.push({date:now,type:'sanction',pts,label});
-  globalHistory.push({type:'sanction',date:now,ninja:name,pts,label,by:currentAdminName});
+  globalHistory.push({type:'sanction',date:now,ninja:name,pts,label,by:currentGerantName});
   const ok=await saveData();
   if(ok){render();showStatus(`Sanction appliquée à ${name} (${pts}pts).`,true);}
   else showStatus('Erreur.',false);
@@ -596,8 +598,8 @@ async function addNinja(){
   const rang=document.getElementById('new-ninja-rang').value;
   if(!name){showStatus('Entre un nom.',false);return;}
   if(ninjas.find(n=>n.name.toLowerCase()===name.toLowerCase())){showStatus('Ce ninja existe déjà.',false);return;}
-  ninjas.push({name,rang,missions:0,points:0,successCount:0,weeklyPoints:0,weeklyMissions:0,history:[]});
-  globalHistory.push({type:'add',date:new Date().toISOString(),ninja:name,rang,by:currentAdminName});
+  ninjas.push({name,rang,missions:0,points:0,successCount:0,yearlyPoints:0,yearlyMissions:0,history:[]});
+  globalHistory.push({type:'add',date:new Date().toISOString(),ninja:name,rang,by:currentGerantName});
   const ok=await saveData();
   if(ok){document.getElementById('new-ninja-name').value='';render();showStatus(name+' ajouté.',true);}
   else showStatus('Erreur.',false);
@@ -606,7 +608,7 @@ async function addNinja(){
 async function removeNinja(name){
   if(!confirm(`Supprimer ${name} ? Cette action est irréversible.`))return;
   ninjas=ninjas.filter(n=>n.name!==name);
-  globalHistory.push({type:'remove',date:new Date().toISOString(),ninja:name,by:currentAdminName});
+  globalHistory.push({type:'remove',date:new Date().toISOString(),ninja:name,by:currentGerantName});
   const ok=await saveData();
   if(ok){render();showStatus(name+' supprimé.',true);}
   else showStatus('Erreur.',false);
@@ -617,46 +619,46 @@ async function editRang(){
   const rang=document.getElementById('edit-ninja-rang').value;
   const n=ninjas.find(x=>x.name===name);if(!n)return;
   n.rang=rang;
-  globalHistory.push({type:'rang',date:new Date().toISOString(),ninja:name,rang,by:currentAdminName});
+  globalHistory.push({type:'rang',date:new Date().toISOString(),ninja:name,rang,by:currentGerantName});
   const ok=await saveData();
   if(ok){render();showStatus(`Rang de ${name} : ${rang||'—'}.`,true);}
   else showStatus('Erreur.',false);
 }
 
-async function resetWeek(){
-  if(!confirm('Réinitialiser les points de la semaine pour tous les ninja ? Irréversible.'))return;
-  ninjas.forEach(n=>{n.weeklyPoints=0;n.weeklyMissions=0;});
-  weeklyReset=new Date().toISOString();
-  globalHistory.push({type:'week_reset',date:weeklyReset,by:currentAdminName});
+async function resetYear(){
+  if(!confirm('Réinitialiser les points de la année pour tous les ninja ? Irréversible.'))return;
+  ninjas.forEach(n=>{n.yearlyPoints=0;n.yearlyMissions=0;});
+  yearlyReset=new Date().toISOString();
+  globalHistory.push({type:'year_reset',date:yearlyReset,by:currentGerantName});
   const ok=await saveData();
-  if(ok){render();showStatus('Semaine réinitialisée.',true);}
+  if(ok){render();showStatus('Année réinitialisée.',true);}
   else showStatus('Erreur.',false);
 }
 
-async function addAdmin(){
+async function addGérant(){
   const name=document.getElementById('new-admin-name').value.trim();
   const pwd=document.getElementById('new-admin-pwd').value.trim();
   if(!name||!pwd){showStatus('Nom et mot de passe requis.',false);return;}
-  if(admins.find(a=>a.name.toLowerCase()===name.toLowerCase())){showStatus('Cet admin existe déjà.',false);return;}
-  admins.push({name,password:pwd});
+  if(gerants.find(a=>a.name.toLowerCase()===name.toLowerCase())){showStatus('Ce gérant existe déjà.',false);return;}
+  gerants.push({name,password:pwd});
   const ok=await saveData();
-  if(ok){document.getElementById('new-admin-name').value='';document.getElementById('new-admin-pwd').value='';populateLoginDropdown();renderAdminList();showStatus(name+' ajouté comme admin.',true);}
+  if(ok){document.getElementById('new-admin-name').value='';document.getElementById('new-admin-pwd').value='';populateLoginDropdown();renderGerantList();showStatus(name+' ajouté comme gérant.',true);}
   else showStatus('Erreur.',false);
 }
 
-async function removeAdmin(name){
-  if(admins.length<=1){showStatus('Impossible — dernier admin.',false);return;}
+async function removeGérant(name){
+  if(gerants.length<=1){showStatus('Impossible — dernier gérant.',false);return;}
   if(!confirm(`Retirer l'accès admin de ${name} ?`))return;
-  admins=admins.filter(a=>a.name!==name);
+  gerants=gerants.filter(a=>a.name!==name);
   const ok=await saveData();
-  if(ok){populateLoginDropdown();renderAdminList();showStatus(name+' retiré des admins.',true);}
+  if(ok){populateLoginDropdown();renderGerantList();showStatus(name+' retiré des gérants.',true);}
   else showStatus('Erreur.',false);
 }
 
 function selectAll(){document.querySelectorAll('#ninja-checkboxes .ninja-check:not([style*="none"]) input').forEach(c=>c.checked=true);}
 function deselectAll(){document.querySelectorAll('#ninja-checkboxes input').forEach(c=>c.checked=false);}
-function renderAdminStats(){
-  const el=document.getElementById('admin-stats-content');
+function renderGérantStats(){
+  const el=document.getElementById('gerant-stats-content');
   if(!el)return;
   // Agréger par admin
   const stats={};
@@ -665,7 +667,7 @@ function renderAdminStats(){
     if(!stats[who])stats[who]={missions:0,ninjas:0,sanctions:0,resets:0};
     if(h.type==='mission'){stats[who].missions++;stats[who].ninjas+=(h.ninjas||[]).length;}
     if(h.type==='sanction')stats[who].sanctions++;
-    if(h.type==='week_reset')stats[who].resets++;
+    if(h.type==='year_reset')stats[who].resets++;
   });
   const sorted=Object.entries(stats).sort((a,b)=>b[1].missions-a[1].missions);
   if(!sorted.length){el.innerHTML='<div class="log-empty">Aucune action enregistrée.</div>';return;}
@@ -675,9 +677,9 @@ function renderAdminStats(){
       <span style="color:#c88600;font-size:.88rem">⚔ <b>${s.missions}</b> missions validées</span>
       <span style="color:#7a6a40;font-size:.82rem">(${s.ninjas} ninja(s) concerné(s))</span>
       <span style="color:#e04040;font-size:.82rem">⚠ ${s.sanctions} sanction(s)</span>
-      ${s.resets?`<span style="color:#2090e0;font-size:.82rem">⚡ ${s.resets} reset(s) semaine</span>`:''}
+      ${s.resets?`<span style="color:#2090e0;font-size:.82rem">⚡ ${s.resets} reset(s) année</span>`:''}
     </div>`).join('');
-  el.innerHTML=`<div class="section-label" style="margin-bottom:10px">ACTIVITÉ PAR ADMIN</div><div class="manage-list" style="max-height:400px">${rows}</div>`;
+  el.innerHTML=`<div class="section-label" style="margin-bottom:10px">ACTIVITÉ PAR GÉRANT</div><div class="manage-list" style="max-height:400px">${rows}</div>`;
 }
 
 function filterNinjaList(){
@@ -688,7 +690,7 @@ function filterNinjaList(){
 }
 
 /* LOGIN */
-function toggleLogin(){if(isAdmin){logoutAdmin();return;}document.getElementById('login-overlay').classList.add('show');setTimeout(()=>document.getElementById('pwd-input').focus(),100);}
+function toggleLogin(){if(isGerant){logoutGerant();return;}document.getElementById('login-overlay').classList.add('show');setTimeout(()=>document.getElementById('pwd-input').focus(),100);}
 function closeLogin(){document.getElementById('login-overlay').classList.remove('show');document.getElementById('login-error').style.display='none';document.getElementById('pwd-input').value='';}
 function checkPwd(){
   const name=document.getElementById('login-name').value;
@@ -697,24 +699,24 @@ function checkPwd(){
   if(pwd===MASTER_PWD){loginAs('BDM Maître');return;}
   // Named admin
   if(name==='__master__'){document.getElementById('login-error').style.display='block';document.getElementById('pwd-input').value='';return;}
-  const admin=admins.find(a=>a.name===name&&a.password===pwd);
+  const admin=gerants.find(a=>a.name===name&&a.password===pwd);
   if(admin){loginAs(admin.name);}
   else{document.getElementById('login-error').style.display='block';document.getElementById('pwd-input').value='';}
 }
 function loginAs(name){
-  isAdmin=true;currentAdminName=name;closeLogin();
-  document.getElementById('admin-panel').classList.add('show');
+  isGerant=true;currentGerantName=name;closeLogin();
+  document.getElementById('gerant-panel').classList.add('show');
   document.getElementById('login-btn').classList.add('active');
   document.getElementById('login-btn').textContent='⚙ DÉCO';
-  document.getElementById('admin-who').textContent='Connecté : '+name;
+  document.getElementById('gerant-who').textContent='Connecté : '+name;
   render();
 }
-function logoutAdmin(){
-  isAdmin=false;currentAdminName='';
-  document.getElementById('admin-panel').classList.remove('show');
+function logoutGerant(){
+  isGerant=false;currentGerantName='';
+  document.getElementById('gerant-panel').classList.remove('show');
   document.getElementById('login-btn').classList.remove('active');
-  document.getElementById('login-btn').textContent='⚙ ADMIN';
-  document.getElementById('admin-who').textContent='';
+  document.getElementById('login-btn').textContent='⚙ GÉRANT';
+  document.getElementById('gerant-who').textContent='';
 }
 
 loadData();
