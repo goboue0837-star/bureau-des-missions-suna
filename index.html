@@ -286,7 +286,7 @@
       <div class="form-row">
         <div class="form-group"><label>NOM</label><input type="text" id="new-admin-name" placeholder="Pseudo ingame"></div>
         <div class="form-group"><label>MOT DE PASSE</label><input type="password" id="new-admin-pwd" placeholder="Mot de passe"></div>
-        <button class="btn btn-sm" onclick="addGérant()">AJOUTER</button>
+        <button class="btn btn-sm" onclick="addGerant()">AJOUTER</button>
       </div>
     </div>
 
@@ -364,7 +364,7 @@ async function loadData(){
   const j=await r.json();
   ninjas=(j.record.ninjas||[]).map(n=>({history:[],rang:'',successCount:0,yearlyPoints:0,yearlyMissions:0,...n}));
   globalHistory=j.record.globalHistory||[];
-  gerants=j.record.gerants||[{name:"Aozora",password:"aozora"},{name:"Lior",password:"lior"}];
+  gerants=j.record.gerants||j.record.admins||[{name:"Aozora",password:"aozora"},{name:"Lior",password:"lior"}];
   yearlyReset=j.record.yearlyReset||new Date().toISOString();
   populateLoginDropdown();
   render();
@@ -479,7 +479,7 @@ function renderGerantList(){
   if(!el)return;
   el.innerHTML=gerants.map(a=>`<div class="manage-item">
     <span class="manage-item-name">${a.name}</span>
-    <button class="del-btn" onclick="removeGérant('${a.name.replace(/'/g,"\\'")}')">Retirer</button>
+    <button class="del-btn" onclick="removeGerant('${a.name.replace(/'/g,"\\'")}')">Retirer</button>
   </div>`).join('');
 }
 
@@ -512,7 +512,7 @@ function switchGerantTab(tab,btn){
   btn.classList.add('active');
   document.getElementById('admin-'+tab).classList.add('active');
   if(tab==='historique')renderHistory();
-  if(tab==='stats')renderGérantStats();
+  if(tab==='stats')renderGerantStats();
 }
 function onSearch(){searchVal=document.getElementById('search-input').value;const s=[...ninjas].sort((a,b)=>b.points-a.points);renderClassement(s);renderAnnée();renderGrade(s);}
 
@@ -635,7 +635,7 @@ async function resetYear(){
   else showStatus('Erreur.',false);
 }
 
-async function addGérant(){
+async function addGerant(){
   const name=document.getElementById('new-admin-name').value.trim();
   const pwd=document.getElementById('new-admin-pwd').value.trim();
   if(!name||!pwd){showStatus('Nom et mot de passe requis.',false);return;}
@@ -646,7 +646,7 @@ async function addGérant(){
   else showStatus('Erreur.',false);
 }
 
-async function removeGérant(name){
+async function removeGerant(name){
   if(gerants.length<=1){showStatus('Impossible — dernier gérant.',false);return;}
   if(!confirm(`Retirer l'accès admin de ${name} ?`))return;
   gerants=gerants.filter(a=>a.name!==name);
@@ -657,7 +657,7 @@ async function removeGérant(name){
 
 function selectAll(){document.querySelectorAll('#ninja-checkboxes .ninja-check:not([style*="none"]) input').forEach(c=>c.checked=true);}
 function deselectAll(){document.querySelectorAll('#ninja-checkboxes input').forEach(c=>c.checked=false);}
-function renderGérantStats(){
+function renderGerantStats(){
   const el=document.getElementById('gerant-stats-content');
   if(!el)return;
   // Agréger par admin
