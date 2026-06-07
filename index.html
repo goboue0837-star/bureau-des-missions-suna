@@ -173,6 +173,7 @@
       <button class="admin-tab" onclick="switchAdminTab('sanction',this)">SANCTION</button>
       <button class="admin-tab" onclick="switchAdminTab('gerer',this)">GÉRER</button>
       <button class="admin-tab" onclick="switchAdminTab('historique',this)">HISTORIQUE</button>
+      <button class="admin-tab" onclick="switchAdminTab('stats',this)">STATS ADMINS</button>
     </div>
 
     <!-- MISSION -->
@@ -290,6 +291,11 @@
     <!-- HISTORIQUE -->
     <div id="admin-historique" class="admin-section">
       <div class="log-wrap" id="history-log"><div class="log-empty">Aucune action enregistrée.</div></div>
+    </div>
+
+    <!-- STATS ADMINS -->
+    <div id="admin-stats" class="admin-section">
+      <div id="admin-stats-content"></div>
     </div>
 
     <div id="status-msg"></div>
@@ -504,6 +510,7 @@ function switchAdminTab(tab,btn){
   btn.classList.add('active');
   document.getElementById('admin-'+tab).classList.add('active');
   if(tab==='historique')renderHistory();
+  if(tab==='stats')renderAdminStats();
 }
 function onSearch(){searchVal=document.getElementById('search-input').value;const s=[...ninjas].sort((a,b)=>b.points-a.points);renderClassement(s);renderSemaine();renderGrade(s);}
 
@@ -648,6 +655,31 @@ async function removeAdmin(name){
 
 function selectAll(){document.querySelectorAll('#ninja-checkboxes .ninja-check:not([style*="none"]) input').forEach(c=>c.checked=true);}
 function deselectAll(){document.querySelectorAll('#ninja-checkboxes input').forEach(c=>c.checked=false);}
+function renderAdminStats(){
+  const el=document.getElementById('admin-stats-content');
+  if(!el)return;
+  // Agréger par admin
+  const stats={};
+  globalHistory.forEach(h=>{
+    const who=h.by||'ancien';
+    if(!stats[who])stats[who]={missions:0,ninjas:0,sanctions:0,resets:0};
+    if(h.type==='mission'){stats[who].missions++;stats[who].ninjas+=(h.ninjas||[]).length;}
+    if(h.type==='sanction')stats[who].sanctions++;
+    if(h.type==='week_reset')stats[who].resets++;
+  });
+  const sorted=Object.entries(stats).sort((a,b)=>b[1].missions-a[1].missions);
+  if(!sorted.length){el.innerHTML='<div class="log-empty">Aucune action enregistrée.</div>';return;}
+  const rows=sorted.map(([name,s])=>`
+    <div class="manage-item" style="flex-wrap:wrap;gap:10px">
+      <span class="manage-item-name" style="font-family:'Cinzel',serif;color:#e0c97f;min-width:130px">${name}</span>
+      <span style="color:#c88600;font-size:.88rem">⚔ <b>${s.missions}</b> missions validées</span>
+      <span style="color:#7a6a40;font-size:.82rem">(${s.ninjas} ninja(s) concerné(s))</span>
+      <span style="color:#e04040;font-size:.82rem">⚠ ${s.sanctions} sanction(s)</span>
+      ${s.resets?`<span style="color:#2090e0;font-size:.82rem">⚡ ${s.resets} reset(s) semaine</span>`:''}
+    </div>`).join('');
+  el.innerHTML=`<div class="section-label" style="margin-bottom:10px">ACTIVITÉ PAR ADMIN</div><div class="manage-list" style="max-height:400px">${rows}</div>`;
+}
+
 function filterNinjaList(){
   const q=document.getElementById('ninja-search').value.toLowerCase();
   document.querySelectorAll('#ninja-checkboxes .ninja-check').forEach(el=>{
