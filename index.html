@@ -280,13 +280,16 @@
 
       <hr class="sep">
 
-      <!-- Gérer les gérants -->
-      <div class="section-label">GÉRER LES GÉRANTS</div>
-      <div id="gerant-list" class="manage-list" style="margin-bottom:10px"></div>
-      <div class="form-row">
-        <div class="form-group"><label>NOM</label><input type="text" id="new-admin-name" placeholder="Pseudo ingame"></div>
-        <div class="form-group"><label>MOT DE PASSE</label><input type="password" id="new-admin-pwd" placeholder="Mot de passe"></div>
-        <button class="btn btn-sm" onclick="addGerant()">AJOUTER</button>
+      <!-- Gérer les gérants (Maître seulement) -->
+      <div id="gerant-management" style="display:none">
+        <hr class="sep">
+        <div class="section-label">GÉRER LES GÉRANTS</div>
+        <div id="gerant-list" class="manage-list" style="margin-bottom:10px"></div>
+        <div class="form-row">
+          <div class="form-group"><label>NOM</label><input type="text" id="new-admin-name" placeholder="Pseudo ingame"></div>
+          <div class="form-group"><label>MOT DE PASSE</label><input type="password" id="new-admin-pwd" placeholder="Mot de passe"></div>
+          <button class="btn btn-sm" onclick="addGerant()">AJOUTER</button>
+        </div>
       </div>
     </div>
 
@@ -475,6 +478,8 @@ function renderRemoveList(sorted){
 }
 
 function renderGerantList(){
+  const section=document.getElementById('gerant-management');
+  if(section)section.style.display=currentGerantName==='BDM Maître'?'block':'none';
   const el=document.getElementById('gerant-list');
   if(!el)return;
   el.innerHTML=gerants.map(a=>`<div class="manage-item">
