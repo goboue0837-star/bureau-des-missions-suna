@@ -180,6 +180,7 @@
       <div class="sel-controls">
         <button onclick="selectAll()">Tout sélectionner</button>
         <button onclick="deselectAll()">Tout désélectionner</button>
+        <input type="text" id="ninja-search" placeholder="Rechercher..." oninput="filterNinjaList()" style="background:#0a0a0a;border:1px solid #2a1a00;color:#e0c97f;padding:3px 10px;font-family:'Rajdhani',sans-serif;font-size:.82rem;border-radius:4px;margin-left:4px;width:160px">
       </div>
       <div id="ninja-checkboxes"></div>
       <div class="form-row">
@@ -645,8 +646,14 @@ async function removeAdmin(name){
   else showStatus('Erreur.',false);
 }
 
-function selectAll(){document.querySelectorAll('#ninja-checkboxes input').forEach(c=>c.checked=true);}
+function selectAll(){document.querySelectorAll('#ninja-checkboxes .ninja-check:not([style*="none"]) input').forEach(c=>c.checked=true);}
 function deselectAll(){document.querySelectorAll('#ninja-checkboxes input').forEach(c=>c.checked=false);}
+function filterNinjaList(){
+  const q=document.getElementById('ninja-search').value.toLowerCase();
+  document.querySelectorAll('#ninja-checkboxes .ninja-check').forEach(el=>{
+    el.style.display=el.querySelector('span').textContent.toLowerCase().includes(q)?'':'none';
+  });
+}
 
 /* LOGIN */
 function toggleLogin(){if(isAdmin){logoutAdmin();return;}document.getElementById('login-overlay').classList.add('show');setTimeout(()=>document.getElementById('pwd-input').focus(),100);}
