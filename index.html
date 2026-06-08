@@ -400,8 +400,10 @@ function renderClassement(sorted){
   const filtered=q?sorted.filter(n=>n.name.toLowerCase().includes(q)):sorted;
   if(!filtered.length){document.getElementById('tab-classement').innerHTML='<div class="loading">Aucun ninja trouvé.</div>';return;}
   const mx=sorted[0]?Math.max(sorted[0].points,1):1;
+  // Calcul rang ex-aequo : compte combien ont PLUS de points
+  const getRank=pts=>sorted.filter(x=>x.points>pts).length+1;
   const rows=filtered.map((n,i)=>{
-    const g=getGrade(n.points),rank=sorted.indexOf(n)+1,p=Math.round(n.points/mx*100);
+    const g=getGrade(n.points),rank=getRank(n.points),p=Math.round(n.points/mx*100);
     return `<tr onclick="openProfile('${n.name.replace(/'/g,"\\'")}')">
       <td class="rank-num">${rank}</td>
       <td>${n.name}</td>
@@ -421,11 +423,13 @@ function renderAnnée(){
   const filtered=q?sorted.filter(n=>n.name.toLowerCase().includes(q)):sorted;
   const mx=sorted[0]?Math.max(sorted[0].yearlyPoints||0,1):1;
   const resetInfo=yearlyReset?'Réinitialisé le '+fmtDateShort(yearlyReset):'';
+  const getYearRank=pts=>sorted.filter(x=>(x.yearlyPoints||0)>pts).length+1;
   const rows=filtered.map((n,i)=>{
     const p=Math.round((n.yearlyPoints||0)/mx*100);
-    const medal=i===0&&(n.yearlyPoints||0)>0?'👑 ':'';
+    const rank=getYearRank(n.yearlyPoints||0);
+    const medal=rank===1&&(n.yearlyPoints||0)>0?'👑 ':'';
     return `<tr onclick="openProfile('${n.name.replace(/'/g,"\\'")}')">
-      <td class="rank-num">${i+1}</td>
+      <td class="rank-num">${rank}</td>
       <td>${medal}${n.name}</td>
       <td>${n.rang||'<span style="color:#3a2a00">—</span>'}</td>
       <td>${n.yearlyMissions||0}</td>
