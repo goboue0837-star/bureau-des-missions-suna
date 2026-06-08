@@ -534,7 +534,10 @@ function openProfile(name){
   const taux=n.missions>0?Math.round((n.successCount||0)/n.missions*100)+'%':'—';
   document.getElementById('p-taux').textContent=taux;
   const hist=n.history||[];
-  const histHTML=[...hist].reverse().map(h=>{
+  const safeName=n.name.replace(/'/g,"\\'");
+  const histHTML=[...hist].map((h,i)=>{
+    const realIdx=hist.length-1-([...hist].reverse().indexOf(h)); // index réel dans hist
+    const delBtn=isGerant?`<button onclick="deleteHistoryItem('${safeName}',${hist.indexOf(h)})" style="background:none;border:none;color:#5a3a3a;cursor:pointer;font-size:.85rem;margin-left:6px;padding:0 4px;line-height:1" title="Supprimer">✕</button>`:'';
     if(h.type==='sanction'){
       return`<div class="hist-item">
         <span style="color:#e04040;font-weight:700;min-width:20px">⚠</span>
@@ -542,6 +545,7 @@ function openProfile(name){
         <span style="color:#888;font-size:.78rem;flex:1">${h.label||''}</span>
         <span style="color:#e04040">${h.pts}pts</span>
         <span class="hist-date">${fmtDate(h.date)}</span>
+        ${delBtn}
       </div>`;
     }
     return`<div class="hist-item">
@@ -549,10 +553,24 @@ function openProfile(name){
       <span>${h.result==='success'?'<span class="hist-ok">Succès</span>':'<span class="hist-fail">Échec</span>'}</span>
       <span style="color:#c88600">${h.pts>0?'+'+h.pts+'pts':'0pt'}</span>
       <span class="hist-date">${fmtDate(h.date)}</span>
+      ${delBtn}
     </div>`;
-  }).join('');
+  }).reverse().join('');
   document.getElementById('p-history').innerHTML=hist.length?histHTML:'<div style="color:#3a2a00;font-style:italic;padding:10px 0">Aucune entrée enregistrée.</div>';
   document.getElementById('profile-overlay').classList.add('show');
+}
+async function deleteHistoryItem(name,idx){
+  const n=ninjas.find(x=>x.name===name);if(!n)return;
+  n.history.splice(idx,1);
+  // Recalcul complet depuis l'historique
+  n.points=0;n.missions=0;n.successCount=0;n.yearlyPoints=0;n.yearlyMissions=0;
+  (n.history||[]).forEach(h=>{
+    if(h.type==='sanction'){n.points=Math.max(0,n.points+h.pts);}
+    else{n.missions++;n.points+=h.pts;if(h.result==='success')n.successCount++;n.yearlyMissions++;n.yearlyPoints+=h.pts;}
+  });
+  const ok=await saveData();
+  if(ok){render();openProfile(name);}
+  else showStatus('Erreur lors de la suppression.',false);
 }
 function closeProfile(e){if(e.target===document.getElementById('profile-overlay'))closeProfileBtn();}
 function closeProfileBtn(){document.getElementById('profile-overlay').classList.remove('show');}
