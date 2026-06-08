@@ -500,6 +500,7 @@ function renderHistory(){
     if(h.type==='remove')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${who}</div><span class="log-remove">✕ Suppression</span> — ${h.ninja}</div>`;
     if(h.type==='rang')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${who}</div><span class="log-add">✎ Rang modifié</span> — ${h.ninja} → ${h.rang||'—'}</div>`;
     if(h.type==='year_reset')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${who}</div><span class="log-week">⚡ Réinitialisation année</span></div>`;
+    if(h.type==='delete_entry')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${who}</div><span class="log-remove">✕ Entrée supprimée</span> — ${h.ninja} : ${h.entry}</div>`;
     return'';
   }).join('');
 }
@@ -561,6 +562,8 @@ function openProfile(name){
 }
 async function deleteHistoryItem(name,idx){
   const n=ninjas.find(x=>x.name===name);if(!n)return;
+  const entry=n.history[idx];
+  const entryDesc=entry.type==='sanction'?`Sanction "${entry.label||''}" (${entry.pts}pts)`:`Mission Rang ${entry.rank} — ${entry.result==='success'?'Succès':'Échec'} (${entry.pts}pts)`;
   n.history.splice(idx,1);
   // Recalcul complet depuis l'historique
   n.points=0;n.missions=0;n.successCount=0;n.yearlyPoints=0;n.yearlyMissions=0;
@@ -568,6 +571,7 @@ async function deleteHistoryItem(name,idx){
     if(h.type==='sanction'){n.points=Math.max(0,n.points+h.pts);}
     else{n.missions++;n.points+=h.pts;if(h.result==='success')n.successCount++;n.yearlyMissions++;n.yearlyPoints+=h.pts;}
   });
+  globalHistory.push({type:'delete_entry',date:new Date().toISOString(),ninja:name,entry:entryDesc,by:currentGerantName});
   const ok=await saveData();
   if(ok){render();openProfile(name);}
   else showStatus('Erreur lors de la suppression.',false);
