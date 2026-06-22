@@ -414,7 +414,7 @@ function renderClassement(sorted){
       <td><span class="grade-badge ${g.cls}">${g.label}</span></td>
     </tr>`;
   }).join('');
-  document.getElementById('tab-classement').innerHTML=`<div style="max-height:420px;overflow-y:auto;border:1px solid #1e1400;border-radius:6px"><table><thead><tr><th style="position:sticky;top:0;background:#140e00;z-index:1">#</th><th style="position:sticky;top:0;background:#140e00;z-index:1">NINJA</th><th style="position:sticky;top:0;background:#140e00;z-index:1">RANG</th><th style="position:sticky;top:0;background:#140e00;z-index:1">MISSIONS</th><th style="position:sticky;top:0;background:#140e00;z-index:1">POINTS</th><th style="position:sticky;top:0;background:#140e00;z-index:1"></th><th style="position:sticky;top:0;background:#140e00;z-index:1">GRADE BDM</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  document.getElementById('tab-classement').innerHTML=`<div style="max-height:300px;overflow-y:auto;border:1px solid #1e1400;border-radius:6px"><table><thead><tr><th style="position:sticky;top:0;background:#140e00;z-index:1">#</th><th style="position:sticky;top:0;background:#140e00;z-index:1">NINJA</th><th style="position:sticky;top:0;background:#140e00;z-index:1">RANG</th><th style="position:sticky;top:0;background:#140e00;z-index:1">MISSIONS</th><th style="position:sticky;top:0;background:#140e00;z-index:1">POINTS</th><th style="position:sticky;top:0;background:#140e00;z-index:1"></th><th style="position:sticky;top:0;background:#140e00;z-index:1">GRADE BDM</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
 function renderAnnée(){
@@ -443,7 +443,7 @@ function renderAnnée(){
       <span class="week-reset-info">⚡ POINTS DE LA ANNÉE — ${resetInfo}</span>
       ${resetBtn}
     </div>
-    <div style="max-height:420px;overflow-y:auto;border:1px solid #1e1400;border-radius:6px"><table><thead><tr><th style="position:sticky;top:0;background:#140e00;z-index:1">#</th><th style="position:sticky;top:0;background:#140e00;z-index:1">NINJA</th><th style="position:sticky;top:0;background:#140e00;z-index:1">RANG</th><th style="position:sticky;top:0;background:#140e00;z-index:1">MISSIONS</th><th style="position:sticky;top:0;background:#140e00;z-index:1">PTS ANNÉE</th><th style="position:sticky;top:0;background:#140e00;z-index:1"></th></tr></thead><tbody>${rows||'<tr><td colspan="6" style="text-align:center;color:#3a2a00;padding:20px">Aucune mission cette année.</td></tr>'}</tbody></table></div>`;
+    <div style="max-height:300px;overflow-y:auto;border:1px solid #1e1400;border-radius:6px"><table><thead><tr><th style="position:sticky;top:0;background:#140e00;z-index:1">#</th><th style="position:sticky;top:0;background:#140e00;z-index:1">NINJA</th><th style="position:sticky;top:0;background:#140e00;z-index:1">RANG</th><th style="position:sticky;top:0;background:#140e00;z-index:1">MISSIONS</th><th style="position:sticky;top:0;background:#140e00;z-index:1">PTS ANNÉE</th><th style="position:sticky;top:0;background:#140e00;z-index:1"></th></tr></thead><tbody>${rows||'<tr><td colspan="6" style="text-align:center;color:#3a2a00;padding:20px">Aucune mission cette année.</td></tr>'}</tbody></table></div>`;
 }
 
 function renderGrade(sorted){
