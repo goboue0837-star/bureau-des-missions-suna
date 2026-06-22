@@ -98,6 +98,13 @@
     #ninja-chips{display:flex;flex-wrap:wrap;gap:5px;min-height:30px;padding:6px 8px;background:#0e0900;border:1px solid #1e1400;border-radius:6px;margin-bottom:8px;align-items:center}
     .ninja-chip{display:inline-flex;align-items:center;gap:5px;background:#2a1500;border:1px solid #c88600;color:#c88600;padding:3px 10px;border-radius:12px;font-size:.78rem;cursor:pointer;transition:background .15s}
     .ninja-chip:hover{background:#3a2000}
+    .input-error{border-color:#c04040!important;box-shadow:0 0 0 2px #c0404030}
+    .quick-sep{border:none;border-top:1px solid #1e1400;margin:14px 0}
+    #quick-names{width:100%;min-height:80px;background:#0a0a0a;border:1px solid #2a1a00;color:#e0c97f;padding:8px 12px;font-family:'Rajdhani',sans-serif;font-size:.88rem;border-radius:6px;resize:vertical}
+    #quick-names:focus{outline:none;border-color:#c88600}
+    #quick-names::placeholder{color:#3a2a00}
+    .quick-result{margin-top:8px;font-size:.8rem;line-height:1.7}
+    .qr-created{color:#20c880}.qr-found{color:#c88600}.qr-unknown{color:#c04040}
     .btn{background:#c88600;color:#000;border:none;padding:8px 20px;font-family:'Cinzel',serif;font-size:.82rem;letter-spacing:1px;border-radius:4px;cursor:pointer;transition:background .2s}
     .btn:hover{background:#ffe066}
     .btn-sm{padding:7px 16px;font-size:.78rem}
@@ -206,6 +213,19 @@
         </div>
         <button class="btn btn-sm" onclick="submitMission()">VALIDER</button>
       </div>
+      <hr class="quick-sep">
+      <div class="section-label" style="margin-bottom:8px">SAISIE RAPIDE — UN NOM PAR LIGNE</div>
+      <textarea id="quick-names" placeholder="Prénom Nom&#10;Prénom Nom&#10;..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+        <select id="quick-rank" style="background:#0a0a0a;border:1px solid #3a2a00;color:#e0c97f;padding:6px 10px;font-family:'Rajdhani',sans-serif;font-size:.88rem;border-radius:4px">
+          <option value="D">Rang D</option><option value="C">Rang C</option><option value="B">Rang B</option><option value="A">Rang A</option><option value="S">Rang S</option>
+        </select>
+        <select id="quick-result" style="background:#0a0a0a;border:1px solid #3a2a00;color:#e0c97f;padding:6px 10px;font-family:'Rajdhani',sans-serif;font-size:.88rem;border-radius:4px">
+          <option value="success">Succès ✓</option><option value="fail">Échec</option>
+        </select>
+        <button class="btn btn-sm" onclick="submitQuickMission()">ENVOYER</button>
+      </div>
+      <div id="quick-result-log" class="quick-result"></div>
     </div>
 
     <!-- SANCTION -->
@@ -650,11 +670,53 @@ async function submitSanction(){
   else showStatus('Erreur.',false);
 }
 
+async function submitQuickMission(){
+  const raw=document.getElementById('quick-names').value;
+  const rank=document.getElementById('quick-rank').value;
+  const result=document.getElementById('quick-result').value;
+  const pts=result==='success'?RANK_PTS[rank]:0;
+  const names=raw.split('\n').map(s=>s.trim()).filter(s=>s.length>0);
+  if(!names.length){showStatus('Entre au moins un nom.',false);return;}
+  const now=new Date().toISOString();
+  const log=[];
+  names.forEach(input=>{
+    const found=ninjas.find(n=>n.name.toLowerCase()===input.toLowerCase());
+    if(found){
+      found.missions+=1;found.points+=pts;
+      found.yearlyMissions=(found.yearlyMissions||0)+1;
+      found.yearlyPoints=(found.yearlyPoints||0)+pts;
+      if(result==='success')found.successCount=(found.successCount||0)+1;
+      if(!found.history)found.history=[];
+      found.history.push({date:now,rank,result,pts});
+      log.push(`<span class="qr-found">✓ ${found.name} — trouvé (+${pts}pts)</span>`);
+    } else {
+      const newN={name:input,rang:'',missions:1,points:pts,successCount:result==='success'?1:0,yearlyPoints:pts,yearlyMissions:1,history:[{date:now,rank,result,pts}]};
+      ninjas.push(newN);
+      globalHistory.push({type:'add',date:now,ninja:input,rang:'',by:currentGerantName});
+      log.push(`<span class="qr-created">★ ${input} — créé et ajouté (+${pts}pts)</span>`);
+    }
+  });
+  const affectedNames=names.map(input=>{const f=ninjas.find(n=>n.name.toLowerCase()===input.toLowerCase());return f?f.name:input;});
+  globalHistory.push({type:'mission',date:now,rank,result,pts,ninjas:affectedNames,by:currentGerantName});
+  const ok=await saveData();
+  if(ok){
+    document.getElementById('quick-names').value='';
+    document.getElementById('quick-result-log').innerHTML=log.join('<br>');
+    render();
+  } else showStatus('Erreur lors de la sauvegarde.',false);
+}
+
 async function addNinja(){
-  const name=document.getElementById('new-ninja-name').value.trim();
+  const inp=document.getElementById('new-ninja-name');
+  const name=inp.value.trim();
   const rang=document.getElementById('new-ninja-rang').value;
   if(!name){showStatus('Entre un nom.',false);return;}
-  if(ninjas.find(n=>n.name.toLowerCase()===name.toLowerCase())){showStatus('Ce ninja existe déjà.',false);return;}
+  if(ninjas.find(n=>n.name.toLowerCase()===name.toLowerCase())){
+    inp.classList.add('input-error');
+    setTimeout(()=>inp.classList.remove('input-error'),2500);
+    showStatus('⚠️ Ce ninja existe déjà dans le registre !',false);return;
+  }
+  inp.classList.remove('input-error');
   ninjas.push({name,rang,missions:0,points:0,successCount:0,yearlyPoints:0,yearlyMissions:0,history:[]});
   globalHistory.push({type:'add',date:new Date().toISOString(),ninja:name,rang,by:currentGerantName});
   const ok=await saveData();
