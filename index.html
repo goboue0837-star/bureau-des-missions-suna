@@ -88,13 +88,16 @@
     .form-group label{font-size:.72rem;color:#7a6a40;letter-spacing:1px}
     .form-group select,.form-group input{background:#0a0a0a;border:1px solid #3a2a00;color:#e0c97f;padding:7px 10px;font-family:'Rajdhani',sans-serif;font-size:.9rem;border-radius:4px;min-width:130px}
     .form-group select:focus,.form-group input:focus{outline:none;border-color:#c88600}
-    #ninja-checkboxes{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:5px;margin-bottom:10px;max-height:190px;overflow-y:auto;padding:8px;background:#0a0a0a;border:1px solid #1e1400;border-radius:6px}
-    .ninja-check{display:flex;align-items:center;gap:7px;cursor:pointer;padding:3px 5px;border-radius:4px;transition:background .15s;font-size:.86rem}
-    .ninja-check:hover{background:#1a1200}
-    .ninja-check input[type=checkbox]{accent-color:#c88600}
-    .sel-controls{display:flex;gap:8px;margin-bottom:7px}
+    .sel-controls{display:flex;gap:8px;margin-bottom:7px;flex-wrap:wrap;align-items:center}
     .sel-controls button{background:none;border:1px solid #2a1a00;color:#7a6a40;padding:3px 10px;font-family:'Rajdhani',sans-serif;font-size:.75rem;border-radius:4px;cursor:pointer}
     .sel-controls button:hover{border-color:#c88600;color:#c88600}
+    #ninja-list-box{max-height:160px;overflow-y:auto;background:#0a0a0a;border:1px solid #1e1400;border-radius:6px;padding:4px;margin-bottom:8px}
+    .ninja-item{padding:5px 10px;cursor:pointer;border-radius:4px;font-size:.86rem;transition:background .15s;display:flex;justify-content:space-between;align-items:center}
+    .ninja-item:hover{background:#1a1200}
+    .ninja-item.sel{background:#1a1000;color:#c88600}
+    #ninja-chips{display:flex;flex-wrap:wrap;gap:5px;min-height:30px;padding:6px 8px;background:#0e0900;border:1px solid #1e1400;border-radius:6px;margin-bottom:8px;align-items:center}
+    .ninja-chip{display:inline-flex;align-items:center;gap:5px;background:#2a1500;border:1px solid #c88600;color:#c88600;padding:3px 10px;border-radius:12px;font-size:.78rem;cursor:pointer;transition:background .15s}
+    .ninja-chip:hover{background:#3a2000}
     .btn{background:#c88600;color:#000;border:none;padding:8px 20px;font-family:'Cinzel',serif;font-size:.82rem;letter-spacing:1px;border-radius:4px;cursor:pointer;transition:background .2s}
     .btn:hover{background:#ffe066}
     .btn-sm{padding:7px 16px;font-size:.78rem}
@@ -181,9 +184,10 @@
       <div class="sel-controls">
         <button onclick="selectAll()">Tout sélectionner</button>
         <button onclick="deselectAll()">Tout désélectionner</button>
-        <input type="text" id="ninja-search" placeholder="Rechercher..." oninput="filterNinjaList()" style="background:#0a0a0a;border:1px solid #2a1a00;color:#e0c97f;padding:3px 10px;font-family:'Rajdhani',sans-serif;font-size:.82rem;border-radius:4px;margin-left:4px;width:160px">
+        <input type="text" id="ninja-search" placeholder="Rechercher..." oninput="renderNinjaSelection()" style="background:#0a0a0a;border:1px solid #2a1a00;color:#e0c97f;padding:3px 10px;font-family:'Rajdhani',sans-serif;font-size:.82rem;border-radius:4px;margin-left:4px;width:160px">
       </div>
-      <div id="ninja-checkboxes"></div>
+      <div id="ninja-chips"></div>
+      <div id="ninja-list-box"></div>
       <div class="form-row">
         <div class="form-group"><label>RANG</label>
           <select id="mission-rank">
@@ -357,6 +361,29 @@ const GRADES=[
 
 let ninjas=[],globalHistory=[],gerants=[],yearlyReset=null;
 let isGerant=false,currentGerantName='',currentTab='classement',searchVal='';
+let selectedNinjas=new Set();
+
+function toggleNinja(name){
+  if(selectedNinjas.has(name))selectedNinjas.delete(name);
+  else selectedNinjas.add(name);
+  renderNinjaSelection();
+}
+
+function renderNinjaSelection(){
+  const q=(document.getElementById('ninja-search')?.value||'').toLowerCase();
+  const sorted=[...ninjas].sort((a,b)=>a.name.localeCompare(b.name));
+  const filtered=q?sorted.filter(n=>n.name.toLowerCase().includes(q)):sorted;
+  const listBox=document.getElementById('ninja-list-box');
+  if(listBox)listBox.innerHTML=filtered.map(n=>{
+    const s=selectedNinjas.has(n.name);
+    return `<div class="ninja-item${s?' sel':''}" onclick="toggleNinja('${n.name.replace(/'/g,"\\'")}')"><span>${n.name}</span>${s?'<span>✓</span>':''}</div>`;
+  }).join('');
+  const chips=document.getElementById('ninja-chips');
+  if(chips){
+    if(!selectedNinjas.size)chips.innerHTML='<span style="color:#3a2a00;font-size:.8rem;font-style:italic">Cliquer sur un ninja pour le sélectionner</span>';
+    else chips.innerHTML=[...selectedNinjas].map(name=>`<span class="ninja-chip" onclick="toggleNinja('${name.replace(/'/g,"\\'")}')">★ ${name} <span style="font-size:.7rem">✕</span></span>`).join('');
+  }
+}
 
 function getGrade(p){return GRADES.find(g=>p>=g.min&&p<=g.max)||GRADES[0];}
 function fmtDate(iso){const d=new Date(iso);return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}
@@ -463,8 +490,7 @@ function renderGrade(sorted){
 }
 
 function renderGerantLists(sorted){
-  const cb=document.getElementById('ninja-checkboxes');
-  if(cb)cb.innerHTML=sorted.map(n=>`<label class="ninja-check"><input type="checkbox" value="${n.name}"><span>${n.name}</span></label>`).join('');
+  renderNinjaSelection();
   const ss=document.getElementById('sanction-ninja');
   if(ss)ss.innerHTML=sorted.map(n=>`<option value="${n.name}">${n.name}</option>`).join('');
   const es=document.getElementById('edit-ninja-name');
@@ -588,7 +614,7 @@ function showStatus(msg,ok){const el=document.getElementById('status-msg');el.te
 
 /* GÉRANT ACTIONS */
 async function submitMission(){
-  const checked=[...document.querySelectorAll('#ninja-checkboxes input:checked')].map(c=>c.value);
+  const checked=[...selectedNinjas];
   if(!checked.length){showStatus('Sélectionne au moins un ninja.',false);return;}
   const rank=document.getElementById('mission-rank').value;
   const result=document.getElementById('mission-result').value;
@@ -686,8 +712,8 @@ async function removeGerant(name){
   else showStatus('Erreur.',false);
 }
 
-function selectAll(){document.querySelectorAll('#ninja-checkboxes .ninja-check:not([style*="none"]) input').forEach(c=>c.checked=true);}
-function deselectAll(){document.querySelectorAll('#ninja-checkboxes input').forEach(c=>c.checked=false);}
+function selectAll(){ninjas.forEach(n=>selectedNinjas.add(n.name));renderNinjaSelection();}
+function deselectAll(){selectedNinjas.clear();renderNinjaSelection();}
 function renderGerantStats(){
   const el=document.getElementById('gerant-stats-content');
   if(!el)return;
