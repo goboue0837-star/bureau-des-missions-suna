@@ -420,6 +420,27 @@ async function loadData(){
   render();
 }
 async function saveData(){
+  // Récupère la dernière version du serveur avant de sauvegarder
+  // pour éviter d'écraser les changements d'un autre gérant connecté en même temps
+  try {
+    const latest=await fetch("https://api.jsonbin.io/v3/b/"+BIN_ID+"/latest",{headers:{"X-Master-Key":MASTER_KEY}});
+    if(latest.ok){
+      const j=await latest.json();
+      const srv=j.record;
+      // Ajouter les ninjas créés par quelqu'un d'autre depuis notre dernier chargement
+      (srv.ninjas||[]).forEach(sn=>{
+        if(!ninjas.find(n=>n.name.toLowerCase()===sn.name.toLowerCase()))ninjas.push(sn);
+      });
+      // Ajouter les entrées d'historique global qu'on n'a pas localement
+      const ourDates=new Set(globalHistory.map(h=>h.date+h.type+(h.ninja||h.ninjas||'')));
+      (srv.globalHistory||[]).forEach(sh=>{
+        const key=sh.date+sh.type+(sh.ninja||sh.ninjas||'');
+        if(!ourDates.has(key))globalHistory.push(sh);
+      });
+      globalHistory.sort((a,b)=>new Date(a.date)-new Date(b.date));
+      // Les gérants : on garde notre version locale (seul le Maître peut les modifier)
+    }
+  } catch(e){}
   const r=await fetch("https://api.jsonbin.io/v3/b/"+BIN_ID,{method:"PUT",headers:{"Content-Type":"application/json","X-Master-Key":MASTER_KEY},body:JSON.stringify({ninjas,globalHistory,gerants,yearlyReset})});
   return r.ok;
 }
