@@ -382,6 +382,9 @@ const GRADES=[
 let ninjas=[],globalHistory=[],gerants=[],yearlyReset=null;
 let isGerant=false,currentGerantName='',currentTab='classement',searchVal='';
 let selectedNinjas=new Set();
+// Suivi des suppressions intentionnelles pour éviter que la fusion les remette
+let deletedNinjaNames=new Set();
+let deletedHistoryEntries={}; // {ninjaName: Set<date>}
 
 function toggleNinja(name){
   if(selectedNinjas.has(name))selectedNinjas.delete(name);
@@ -421,44 +424,23 @@ async function loadData(){
 }
 async function saveData(){
   // Avant chaque sauvegarde : récupère la version serveur et fusionne
-  // pour éviter qu'un gérant écrase les modifications d'un autre
+  // pour éviter qu'un gérant écrase les ninjas créés par un autre
   try {
     const latest=await fetch("https://api.jsonbin.io/v3/b/"+BIN_ID+"/latest",{headers:{"X-Master-Key":MASTER_KEY}});
     if(latest.ok){
       const j=await latest.json();
       const srv=j.record;
-      // Fusion des ninjas
+      // Ajouter les ninjas créés par un autre gérant depuis notre dernier chargement
+      // mais NE PAS remettre ceux qu'on vient de supprimer intentionnellement
       (srv.ninjas||[]).forEach(sn=>{
+        if(deletedNinjaNames.has(sn.name.toLowerCase()))return;
         const local=ninjas.find(n=>n.name.toLowerCase()===sn.name.toLowerCase());
-        if(!local){
-          // Ninja créé par quelqu'un d'autre → on l'ajoute
-          ninjas.push(sn);
-        } else {
-          // Ninja existant → on fusionne son historique
-          const localDates=new Set((local.history||[]).map(h=>h.date));
-          (sn.history||[]).forEach(sh=>{
-            if(!localDates.has(sh.date)){
-              // Entrée d'historique ajoutée par quelqu'un d'autre → on recalcule
-              if(!local.history)local.history=[];
-              local.history.push(sh);
-              if(sh.type==='sanction'){
-                local.points=Math.max(0,(local.points||0)+sh.pts);
-              } else {
-                local.missions=(local.missions||0)+1;
-                local.points=(local.points||0)+sh.pts;
-                if(sh.result==='success')local.successCount=(local.successCount||0)+1;
-                local.yearlyMissions=(local.yearlyMissions||0)+1;
-                local.yearlyPoints=(local.yearlyPoints||0)+sh.pts;
-              }
-            }
-          });
-          local.history.sort((a,b)=>new Date(a.date)-new Date(b.date));
-        }
+        if(!local)ninjas.push(sn);
       });
-      // Fusion de l'historique global
-      const ourKeys=new Set(globalHistory.map(h=>h.date+'|'+h.type+'|'+(h.ninja||JSON.stringify(h.ninjas)||'')));
+      // Ajouter les entrées d'historique global ajoutées par un autre gérant
+      const ourKeys=new Set(globalHistory.map(h=>h.date+'|'+h.type));
       (srv.globalHistory||[]).forEach(sh=>{
-        const key=sh.date+'|'+sh.type+'|'+(sh.ninja||JSON.stringify(sh.ninjas)||'');
+        const key=sh.date+'|'+sh.type;
         if(!ourKeys.has(key))globalHistory.push(sh);
       });
       globalHistory.sort((a,b)=>new Date(a.date)-new Date(b.date));
@@ -770,6 +752,7 @@ async function addNinja(){
 
 async function removeNinja(name){
   if(!confirm(`Supprimer ${name} ? Cette action est irréversible.`))return;
+  deletedNinjaNames.add(name.toLowerCase()); // Marquer comme supprimé intentionnellement
   ninjas=ninjas.filter(n=>n.name!==name);
   globalHistory.push({type:'remove',date:new Date().toISOString(),ninja:name,by:currentGerantName});
   const ok=await saveData();
