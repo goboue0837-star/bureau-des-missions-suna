@@ -438,9 +438,9 @@ async function saveData(){
         if(!local)ninjas.push(sn);
       });
       // Ajouter les entrées d'historique global ajoutées par un autre gérant
-      const ourKeys=new Set(globalHistory.map(h=>h.date+'|'+h.type));
+      const ourKeys=new Set(globalHistory.map(h=>h.date+'|'+h.type+'|'+(h.ninja||'')+'|'+(Array.isArray(h.ninjas)?h.ninjas.join(','):'')));
       (srv.globalHistory||[]).forEach(sh=>{
-        const key=sh.date+'|'+sh.type;
+        const key=sh.date+'|'+sh.type+'|'+(sh.ninja||'')+'|'+(Array.isArray(sh.ninjas)?sh.ninjas.join(','):'');
         if(!ourKeys.has(key))globalHistory.push(sh);
       });
       globalHistory.sort((a,b)=>new Date(a.date)-new Date(b.date));
@@ -613,7 +613,6 @@ function openProfile(name){
   const hist=n.history||[];
   const safeName=n.name.replace(/'/g,"\\'");
   const histHTML=[...hist].map((h,i)=>{
-    const realIdx=hist.length-1-([...hist].reverse().indexOf(h)); // index réel dans hist
     const delBtn=isGerant?`<button onclick="deleteHistoryItem('${safeName}',${hist.indexOf(h)})" style="background:none;border:1px solid #5a2020;color:#c04040;cursor:pointer;font-size:.75rem;margin-left:8px;padding:1px 6px;border-radius:3px;line-height:1.4;flex-shrink:0" title="Supprimer">✕</button>`:'';
     if(h.type==='sanction'){
       return`<div class="hist-item">
