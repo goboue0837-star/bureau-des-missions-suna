@@ -420,25 +420,48 @@ async function loadData(){
   render();
 }
 async function saveData(){
-  // Récupère la dernière version du serveur avant de sauvegarder
-  // pour éviter d'écraser les changements d'un autre gérant connecté en même temps
+  // Avant chaque sauvegarde : récupère la version serveur et fusionne
+  // pour éviter qu'un gérant écrase les modifications d'un autre
   try {
     const latest=await fetch("https://api.jsonbin.io/v3/b/"+BIN_ID+"/latest",{headers:{"X-Master-Key":MASTER_KEY}});
     if(latest.ok){
       const j=await latest.json();
       const srv=j.record;
-      // Ajouter les ninjas créés par quelqu'un d'autre depuis notre dernier chargement
+      // Fusion des ninjas
       (srv.ninjas||[]).forEach(sn=>{
-        if(!ninjas.find(n=>n.name.toLowerCase()===sn.name.toLowerCase()))ninjas.push(sn);
+        const local=ninjas.find(n=>n.name.toLowerCase()===sn.name.toLowerCase());
+        if(!local){
+          // Ninja créé par quelqu'un d'autre → on l'ajoute
+          ninjas.push(sn);
+        } else {
+          // Ninja existant → on fusionne son historique
+          const localDates=new Set((local.history||[]).map(h=>h.date));
+          (sn.history||[]).forEach(sh=>{
+            if(!localDates.has(sh.date)){
+              // Entrée d'historique ajoutée par quelqu'un d'autre → on recalcule
+              if(!local.history)local.history=[];
+              local.history.push(sh);
+              if(sh.type==='sanction'){
+                local.points=Math.max(0,(local.points||0)+sh.pts);
+              } else {
+                local.missions=(local.missions||0)+1;
+                local.points=(local.points||0)+sh.pts;
+                if(sh.result==='success')local.successCount=(local.successCount||0)+1;
+                local.yearlyMissions=(local.yearlyMissions||0)+1;
+                local.yearlyPoints=(local.yearlyPoints||0)+sh.pts;
+              }
+            }
+          });
+          local.history.sort((a,b)=>new Date(a.date)-new Date(b.date));
+        }
       });
-      // Ajouter les entrées d'historique global qu'on n'a pas localement
-      const ourDates=new Set(globalHistory.map(h=>h.date+h.type+(h.ninja||h.ninjas||'')));
+      // Fusion de l'historique global
+      const ourKeys=new Set(globalHistory.map(h=>h.date+'|'+h.type+'|'+(h.ninja||JSON.stringify(h.ninjas)||'')));
       (srv.globalHistory||[]).forEach(sh=>{
-        const key=sh.date+sh.type+(sh.ninja||sh.ninjas||'');
-        if(!ourDates.has(key))globalHistory.push(sh);
+        const key=sh.date+'|'+sh.type+'|'+(sh.ninja||JSON.stringify(sh.ninjas)||'');
+        if(!ourKeys.has(key))globalHistory.push(sh);
       });
       globalHistory.sort((a,b)=>new Date(a.date)-new Date(b.date));
-      // Les gérants : on garde notre version locale (seul le Maître peut les modifier)
     }
   } catch(e){}
   const r=await fetch("https://api.jsonbin.io/v3/b/"+BIN_ID,{method:"PUT",headers:{"Content-Type":"application/json","X-Master-Key":MASTER_KEY},body:JSON.stringify({ninjas,globalHistory,gerants,yearlyReset})});
