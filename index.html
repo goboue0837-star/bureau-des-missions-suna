@@ -143,6 +143,8 @@
     .loading{text-align:center;padding:50px;color:#3a2a00;font-family:'Cinzel',serif;letter-spacing:2px}
     footer{text-align:center;padding:14px;color:#1e1200;font-size:.7rem;letter-spacing:1px}
   </style>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 <header>
@@ -366,8 +368,17 @@
 </div>
 
 <script>
-const BIN_ID="6a25ba56da38895dfe9605d8";
-const MASTER_KEY="$2a$10$td3NtBvwk1q0e.cArx/UYeT6EvNg227oRjuO7fjPZRRiP/eQXPIm2";
+// Firebase config
+firebase.initializeApp({
+  apiKey:"AIzaSyCXX99opo6u_9l7hjIBXhF6BSKpXg6d4HI",
+  authDomain:"bureau-des-missions-suna.firebaseapp.com",
+  projectId:"bureau-des-missions-suna",
+  storageBucket:"bureau-des-missions-suna.firebasestorage.app",
+  messagingSenderId:"667004415556",
+  appId:"1:667004415556:web:b190757811d2819a691611"
+});
+const db=firebase.firestore();
+const DATA_DOC=db.collection('bdm').doc('data');
 const MASTER_PWD="bdmsunaleboss";
 const RANK_PTS={D:20,C:40,B:60,A:80,S:100};
 const GRADES=[
@@ -413,41 +424,58 @@ function fmtDate(iso){const d=new Date(iso);return d.toLocaleDateString('fr-FR',
 function fmtDateShort(iso){const d=new Date(iso);return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'});}
 
 async function loadData(){
-  const r=await fetch("https://api.jsonbin.io/v3/b/"+BIN_ID+"/latest",{headers:{"X-Master-Key":MASTER_KEY}});
-  const j=await r.json();
-  ninjas=(j.record.ninjas||[]).map(n=>({history:[],rang:'',successCount:0,yearlyPoints:0,yearlyMissions:0,...n}));
-  globalHistory=j.record.globalHistory||[];
-  gerants=j.record.gerants||j.record.admins||[{name:"Aozora",password:"aozora"},{name:"Lior",password:"lior"}];
-  yearlyReset=j.record.yearlyReset||new Date().toISOString();
+  let snap=await DATA_DOC.get();
+  // Migration one-shot : si Firestore est vide, on importe depuis JSONBin
+  if(!snap.exists){
+    try{
+      const r=await fetch("https://api.jsonbin.io/v3/b/6a25ba56da38895dfe9605d8/latest",{headers:{"X-Master-Key":"$2a$10$td3NtBvwk1q0e.cArx/UYeT6EvNg227oRjuO7fjPZRRiP/eQXPIm2"}});
+      if(r.ok){
+        const j=await r.json();
+        await DATA_DOC.set({
+          ninjas:j.record.ninjas||[],
+          globalHistory:j.record.globalHistory||[],
+          gerants:j.record.gerants||j.record.admins||[{name:"Aozora",password:"aozora"},{name:"Lior",password:"lior"}],
+          yearlyReset:j.record.yearlyReset||new Date().toISOString()
+        });
+        snap=await DATA_DOC.get();
+      }
+    }catch(e){console.warn('Migration JSONBin→Firestore échouée:',e);}
+  }
+  const data=snap.exists?snap.data():{};
+  ninjas=(data.ninjas||[]).map(n=>({history:[],rang:'',successCount:0,yearlyPoints:0,yearlyMissions:0,...n}));
+  globalHistory=data.globalHistory||[];
+  gerants=data.gerants||[{name:"Aozora",password:"aozora"},{name:"Lior",password:"lior"}];
+  yearlyReset=data.yearlyReset||new Date().toISOString();
   populateLoginDropdown();
   render();
 }
 async function saveData(){
-  // Avant chaque sauvegarde : récupère la version serveur et fusionne
-  // pour éviter qu'un gérant écrase les ninjas créés par un autre
+  // Transaction Firestore : lecture + fusion + écriture atomiques
+  // Deux gérants simultanés ne peuvent plus se perdre de données
   try {
-    const latest=await fetch("https://api.jsonbin.io/v3/b/"+BIN_ID+"/latest",{headers:{"X-Master-Key":MASTER_KEY}});
-    if(latest.ok){
-      const j=await latest.json();
-      const srv=j.record;
-      // Ajouter les ninjas créés par un autre gérant depuis notre dernier chargement
-      // mais NE PAS remettre ceux qu'on vient de supprimer intentionnellement
+    await db.runTransaction(async(transaction)=>{
+      const snap=await transaction.get(DATA_DOC);
+      const srv=snap.exists?snap.data():{ninjas:[],globalHistory:[],gerants:[],yearlyReset:null};
+      // Fusionner les ninjas du serveur qu'on n'a pas localement (sauf supprimés)
       (srv.ninjas||[]).forEach(sn=>{
         if(deletedNinjaNames.has(sn.name.toLowerCase()))return;
         const local=ninjas.find(n=>n.name.toLowerCase()===sn.name.toLowerCase());
         if(!local)ninjas.push(sn);
       });
-      // Ajouter les entrées d'historique global ajoutées par un autre gérant
+      // Fusionner l'historique global
       const ourKeys=new Set(globalHistory.map(h=>h.date+'|'+h.type+'|'+(h.ninja||'')+'|'+(Array.isArray(h.ninjas)?h.ninjas.join(','):'')));
       (srv.globalHistory||[]).forEach(sh=>{
         const key=sh.date+'|'+sh.type+'|'+(sh.ninja||'')+'|'+(Array.isArray(sh.ninjas)?sh.ninjas.join(','):'');
         if(!ourKeys.has(key))globalHistory.push(sh);
       });
       globalHistory.sort((a,b)=>new Date(a.date)-new Date(b.date));
-    }
-  } catch(e){}
-  const r=await fetch("https://api.jsonbin.io/v3/b/"+BIN_ID,{method:"PUT",headers:{"Content-Type":"application/json","X-Master-Key":MASTER_KEY},body:JSON.stringify({ninjas,globalHistory,gerants,yearlyReset})});
-  return r.ok;
+      transaction.set(DATA_DOC,{ninjas,globalHistory,gerants,yearlyReset});
+    });
+    return true;
+  } catch(e){
+    console.error('saveData error:',e);
+    return false;
+  }
 }
 
 function populateLoginDropdown(){
