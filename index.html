@@ -193,12 +193,18 @@
     .bureau-tab:hover{color:#e0c97f}
     .bureau-tab-content{display:none}
     .bureau-tab-content.btc-active{display:block}
-    .mission-rank-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
-    .mission-rank-col{display:flex;flex-direction:column;align-items:center;gap:8px;background:#080600;border:1px solid #1a1200;border-radius:6px;padding:14px 8px}
-    .mission-rank-label{font-family:'Cinzel',serif;font-size:.82rem;letter-spacing:1px}
-    .mission-rank-input{width:72px;background:#0a0a0a;border:1px solid #3a2a00;color:#e0c97f;padding:7px;font-family:'Rajdhani',sans-serif;font-size:1.15rem;border-radius:4px;text-align:center}
-    .mission-rank-input:focus{outline:none;border-color:#c88600}
-    .mission-total-badge{font-family:'Cinzel',serif;font-size:.82rem;color:#7a6a40;margin-top:4px}
+    .mission-rank-row{display:flex;align-items:center;gap:12px;padding:9px 14px;border-bottom:1px solid #111;background:#080600}
+    .mission-rank-row:first-child{border-radius:6px 6px 0 0}
+    .mission-rank-row:last-child{border-bottom:none;border-radius:0 0 6px 6px}
+    .mission-rank-lbl{font-family:'Cinzel',serif;font-size:.8rem;letter-spacing:2px;min-width:60px}
+    .mission-count-val{font-family:'Cinzel',serif;font-size:1.1rem;color:#e0c97f;min-width:32px;text-align:center}
+    .mission-pm-btn{background:#0e0900;border:1px solid #3a2a00;color:#c88600;width:30px;height:30px;border-radius:4px;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+    .mission-pm-btn:hover{background:#1a0f00;border-color:#c88600}
+    .mission-pm-btn:active{transform:scale(.92)}
+    .mission-rank-bar{flex:1;background:#1a1200;border-radius:3px;height:4px;overflow:hidden}
+    .mission-rank-bar-fill{height:100%;border-radius:3px;transition:width .3s}
+    .bureau-reset-btn{background:none;border:1px solid #3a0000;color:#804040;padding:8px 20px;font-family:'Rajdhani',sans-serif;font-size:.85rem;letter-spacing:2px;border-radius:4px;cursor:pointer;transition:all .2s}
+    .bureau-reset-btn:hover{border-color:#c00;color:#ff6060;background:#1a0000}
   </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -407,7 +413,10 @@
     </div>
     <!-- ONGLET MISSIONS -->
     <div id="bureau-tab-missions" class="bureau-tab-content">
-      <div class="bureau-section-title" style="margin-bottom:20px">MISSIONS PAR GÉRANT</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div class="bureau-section-title" style="margin-bottom:0;border:none">MISSIONS PAR GÉRANT</div>
+        <button class="bureau-reset-btn" onclick="resetAllMissions()">↺ RESET TOUT</button>
+      </div>
       <div class="bureau-grid" id="bureau-mission-cards"></div>
     </div>
     <!-- ONGLET NOTATION -->
@@ -986,26 +995,31 @@ function renderBureau(){
     if(!bureauMembers.length){
       missionCardsEl.innerHTML='<div class="log-empty" style="grid-column:1/-1">Aucun membre à renseigner.</div>';
     } else {
+      const ranks=[
+        {k:'D',color:'#aaa'},{k:'C',color:'#4fc3f7'},
+        {k:'B',color:'#81c784'},{k:'A',color:'#ffb74d'},{k:'S',color:'#e040fb'}
+      ];
       missionCardsEl.innerHTML=bureauMembers.map(m=>{
         const ms=m.missionStats||{D:0,C:0,B:0,A:0,S:0};
         const total=(ms.D||0)+(ms.C||0)+(ms.B||0)+(ms.A||0)+(ms.S||0);
-        const ranks=[
-          {k:'D',color:'#aaa'},{k:'C',color:'#4fc3f7'},
-          {k:'B',color:'#81c784'},{k:'A',color:'#ffb74d'},{k:'S',color:'#e040fb'}
-        ];
-        const cols=ranks.map(r=>`
-          <div class="mission-rank-col">
-            <span class="mission-rank-label" style="color:${r.color}">RANG ${r.k}</span>
-            <input class="mission-rank-input" type="number" min="0" value="${ms[r.k]||0}"
-              id="ms-${m.name}-${r.k}">
-          </div>`).join('');
+        const maxVal=Math.max(1,...ranks.map(r=>ms[r.k]||0));
+        const rows=ranks.map(r=>{
+          const val=ms[r.k]||0;
+          const pct=Math.round(val/maxVal*100);
+          return `<div class="mission-rank-row">
+            <span class="mission-rank-lbl" style="color:${r.color}">RANG ${r.k}</span>
+            <button class="mission-pm-btn" onclick="changeMission('${m.name}','${r.k}',-1)">−</button>
+            <span class="mission-count-val" id="msv-${m.name}-${r.k}">${val}</span>
+            <button class="mission-pm-btn" onclick="changeMission('${m.name}','${r.k}',1)">+</button>
+            <div class="mission-rank-bar"><div class="mission-rank-bar-fill" id="msb-${m.name}-${r.k}" style="width:${pct}%;background:${r.color}"></div></div>
+          </div>`;
+        }).join('');
         return `<div class="bureau-card">
           <div class="bureau-card-header">
             <span class="bureau-card-name">◆ ${m.name}</span>
             <span class="bureau-score-badge" id="ms-total-${m.name}">${total}<span style="font-size:.8rem;color:#7a6a40"> missions</span></span>
           </div>
-          <div class="mission-rank-grid">${cols}</div>
-          <button class="bureau-save-btn" onclick="saveMissionStats('${m.name}')">✓ ENREGISTRER</button>
+          <div style="border:1px solid #1a1200;border-radius:6px;overflow:hidden">${rows}</div>
         </div>`;
       }).join('');
     }
@@ -1109,25 +1123,35 @@ async function removeBureauMember(name){
   else showStatus('Erreur.',false);
 }
 
-async function saveMissionStats(name){
+async function changeMission(name,rank,delta){
   const m=bureauMembers.find(m=>m.name===name);
   if(!m)return;
-  m.missionStats={
-    D:parseInt(document.getElementById('ms-'+name+'-D')?.value)||0,
-    C:parseInt(document.getElementById('ms-'+name+'-C')?.value)||0,
-    B:parseInt(document.getElementById('ms-'+name+'-B')?.value)||0,
-    A:parseInt(document.getElementById('ms-'+name+'-A')?.value)||0,
-    S:parseInt(document.getElementById('ms-'+name+'-S')?.value)||0
-  };
+  if(!m.missionStats)m.missionStats={D:0,C:0,B:0,A:0,S:0};
+  m.missionStats[rank]=Math.max(0,(m.missionStats[rank]||0)+delta);
+  // Mise à jour UI instantanée
+  const valEl=document.getElementById('msv-'+name+'-'+rank);
+  if(valEl)valEl.textContent=m.missionStats[rank];
+  const ranks=['D','C','B','A','S'];
+  const total=ranks.reduce((s,r)=>s+(m.missionStats[r]||0),0);
+  const totalEl=document.getElementById('ms-total-'+name);
+  if(totalEl)totalEl.firstChild.textContent=total;
+  // Recalc barres
+  const maxVal=Math.max(1,...ranks.map(r=>m.missionStats[r]||0));
+  const colors={D:'#aaa',C:'#4fc3f7',B:'#81c784',A:'#ffb74d',S:'#e040fb'};
+  ranks.forEach(r=>{
+    const bar=document.getElementById('msb-'+name+'-'+r);
+    if(bar)bar.style.width=Math.round((m.missionStats[r]||0)/maxVal*100)+'%';
+  });
+  // Sauvegarde Firestore en arrière-plan
+  saveData();
+}
+
+async function resetAllMissions(){
+  if(!confirm('Remettre toutes les missions à 0 pour tous les membres ?'))return;
+  bureauMembers.forEach(m=>m.missionStats={D:0,C:0,B:0,A:0,S:0});
   const ok=await saveData();
-  const msg=document.getElementById('bureau-status-msg');
-  if(msg){
-    msg.textContent=ok?'Missions de '+name+' enregistrées.':'Erreur lors de la sauvegarde.';
-    msg.style.display='block';
-    msg.style.color=ok?'#20c880':'#e04040';
-    setTimeout(()=>msg.style.display='none',3000);
-  }
-  if(ok)renderBureau();
+  if(ok){renderBureau();showStatus('Missions remises à zéro.',true);}
+  else showStatus('Erreur.',false);
 }
 
 async function saveBureauRating(name){
