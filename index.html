@@ -1061,7 +1061,7 @@ function loginAs(name){
   document.getElementById('gerant-who').textContent='Connecté : '+name;
   // Afficher bouton BUREAU seulement pour le Maître
   const bureauBtn=document.getElementById('bureau-btn');
-  if(bureauBtn)bureauBtn.style.display=name==='BDM Maître'?'':'none';
+  if(bureauBtn)bureauBtn.style.display=name==='BDM Maître'?'inline-block':'none';
   render();
 }
 function logoutGerant(){
