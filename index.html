@@ -187,6 +187,18 @@
     .input-field:focus{outline:none;border-color:#c88600}
     .btn-primary{background:#c88600;color:#000;border:none;padding:8px 18px;font-family:'Cinzel',serif;font-size:.78rem;letter-spacing:1px;border-radius:4px;cursor:pointer}
     .btn-primary:hover{background:#ffe066}
+    .bureau-tabs{display:flex;gap:0;padding:0 28px;border-bottom:1px solid #2a1a00;background:#0a0700;position:sticky;top:61px;z-index:9}
+    .bureau-tab{background:none;border:none;color:#7a6a40;padding:11px 22px;font-family:'Rajdhani',sans-serif;font-size:.9rem;letter-spacing:2px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s}
+    .bureau-tab.active{color:#c88600;border-bottom-color:#c88600}
+    .bureau-tab:hover{color:#e0c97f}
+    .bureau-tab-content{display:none}
+    .bureau-tab-content.btc-active{display:block}
+    .mission-rank-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+    .mission-rank-col{display:flex;flex-direction:column;align-items:center;gap:8px;background:#080600;border:1px solid #1a1200;border-radius:6px;padding:14px 8px}
+    .mission-rank-label{font-family:'Cinzel',serif;font-size:.82rem;letter-spacing:1px}
+    .mission-rank-input{width:72px;background:#0a0a0a;border:1px solid #3a2a00;color:#e0c97f;padding:7px;font-family:'Rajdhani',sans-serif;font-size:1.15rem;border-radius:4px;text-align:center}
+    .mission-rank-input:focus{outline:none;border-color:#c88600}
+    .mission-total-badge{font-family:'Cinzel',serif;font-size:.82rem;color:#7a6a40;margin-top:4px}
   </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -376,19 +388,34 @@
     </div>
     <div style="min-width:100px;text-align:right;font-family:'Rajdhani',sans-serif;font-size:.78rem;color:#7a6a40;letter-spacing:1px" id="bureau-connected">Maître du Bureau</div>
   </nav>
+  <div class="bureau-tabs">
+    <button class="bureau-tab btc-active" onclick="switchBureauTab('membres',this)">MEMBRES</button>
+    <button class="bureau-tab" onclick="switchBureauTab('missions',this)">MISSIONS</button>
+    <button class="bureau-tab" onclick="switchBureauTab('notation',this)">NOTATION</button>
+  </div>
   <div class="bureau-body">
-    <div id="bureau-members-mgmt" class="bureau-members-section" style="margin-bottom:32px">
-      <div class="bureau-section-title">GESTION DES MEMBRES</div>
-      <div class="bureau-members-list" id="bureau-member-list"></div>
-      <div class="bureau-add-form">
-        <input id="new-admin-name" class="input-field" style="flex:1;min-width:130px" placeholder="Nom du gérant">
-        <input id="new-admin-pwd" class="input-field" style="flex:1;min-width:130px" placeholder="Mot de passe" type="password">
-        <button class="btn-primary" onclick="addGerant()">AJOUTER</button>
+    <!-- ONGLET MEMBRES -->
+    <div id="bureau-tab-membres" class="bureau-tab-content btc-active">
+      <div class="bureau-members-section">
+        <div class="bureau-section-title">MEMBRES DU BUREAU</div>
+        <div class="bureau-members-list" id="bureau-member-list"></div>
+        <div class="bureau-add-form">
+          <input id="new-bureau-member-name" class="input-field" style="flex:1;min-width:200px" placeholder="Nom du membre">
+          <button class="btn-primary" onclick="addBureauMember()">AJOUTER</button>
+        </div>
       </div>
     </div>
-    <div class="bureau-section-title">NOTATION DES GÉRANTS</div>
-    <div class="bureau-grid" id="bureau-cards"></div>
-    <div id="bureau-status-msg" style="font-size:.84rem;display:none;margin-top:10px"></div>
+    <!-- ONGLET MISSIONS -->
+    <div id="bureau-tab-missions" class="bureau-tab-content">
+      <div class="bureau-section-title" style="margin-bottom:20px">MISSIONS PAR GÉRANT</div>
+      <div class="bureau-grid" id="bureau-mission-cards"></div>
+    </div>
+    <!-- ONGLET NOTATION -->
+    <div id="bureau-tab-notation" class="bureau-tab-content">
+      <div class="bureau-section-title" style="margin-bottom:20px">NOTATION DES GÉRANTS</div>
+      <div class="bureau-grid" id="bureau-cards"></div>
+    </div>
+    <div id="bureau-status-msg" style="font-size:.84rem;display:none;margin-top:10px;text-align:center"></div>
   </div>
 </div>
 
@@ -449,7 +476,7 @@ const GRADES=[
   {min:3000,max:Infinity,label:"Légende du Vent",cls:"g5"}
 ];
 
-let ninjas=[],globalHistory=[],gerants=[],yearlyReset=null;
+let ninjas=[],globalHistory=[],gerants=[],yearlyReset=null,bureauMembers=[];
 let isGerant=false,currentGerantName='',currentTab='classement',searchVal='';
 let selectedNinjas=new Set();
 // Suivi des suppressions intentionnelles pour éviter que la fusion les remette
@@ -504,6 +531,7 @@ async function loadData(){
   ninjas=(data.ninjas||[]).map(n=>({history:[],rang:'',successCount:0,yearlyPoints:0,yearlyMissions:0,...n}));
   globalHistory=data.globalHistory||[];
   gerants=data.gerants||[{name:"Aozora",password:"aozora"},{name:"Lior",password:"lior"}];
+  bureauMembers=data.bureauMembers||[];
   yearlyReset=data.yearlyReset||new Date().toISOString();
   populateLoginDropdown();
   render();
@@ -528,7 +556,7 @@ async function saveData(){
         if(!ourKeys.has(key))globalHistory.push(sh);
       });
       globalHistory.sort((a,b)=>new Date(a.date)-new Date(b.date));
-      transaction.set(DATA_DOC,{ninjas,globalHistory,gerants,yearlyReset});
+      transaction.set(DATA_DOC,{ninjas,globalHistory,gerants,bureauMembers,yearlyReset});
     });
     return true;
   } catch(e){
@@ -918,6 +946,13 @@ function closeBureau(){
   document.body.style.overflow='';
 }
 
+function switchBureauTab(tab,btn){
+  document.querySelectorAll('.bureau-tab').forEach(b=>b.classList.remove('btc-active'));
+  document.querySelectorAll('.bureau-tab-content').forEach(c=>c.classList.remove('btc-active'));
+  btn.classList.add('btc-active');
+  document.getElementById('bureau-tab-'+tab).classList.add('btc-active');
+}
+
 function renderBureau(){
   const CRITERES=[
     {key:'rapports',label:'Rapports de mission',max:25},
@@ -927,67 +962,91 @@ function renderBureau(){
     {key:'avis',label:'Avis de la communauté',max:10},
     {key:'equipe',label:'Esprit d\'équipe',max:10}
   ];
-  // Stats missions par gérant
-  const stats={};
-  globalHistory.forEach(h=>{
-    const who=h.by;
-    if(!who||who==='ancien')return;
-    if(!stats[who])stats[who]={D:0,C:0,B:0,A:0,S:0,total:0};
-    if(h.type==='mission'){
-      const rank=(h.rank||'').toUpperCase();
-      if(stats[who][rank]!==undefined)stats[who][rank]++;
-      stats[who].total++;
-    }
-  });
   const members=gerants.filter(g=>g.name!=='BDM Maître');
-  // Render gestion membres
+
+  // ── Onglet MEMBRES ──
   const memberListEl=document.getElementById('bureau-member-list');
   if(memberListEl){
-    memberListEl.innerHTML=members.length?members.map(g=>{
-      const r=g.ratings||{};
+    memberListEl.innerHTML=bureauMembers.length?bureauMembers.map(m=>{
+      const r=m.ratings||{};
       const score=CRITERES.reduce((s,c)=>s+(parseInt(r[c.key])||0),0);
+      const ms=m.missionStats||{D:0,C:0,B:0,A:0,S:0};
+      const total=(ms.D||0)+(ms.C||0)+(ms.B||0)+(ms.A||0)+(ms.S||0);
       return `<div class="bureau-member-row">
-        <span class="bureau-member-name">◆ ${g.name}</span>
-        <span class="bureau-member-score">${score}/100 pts</span>
-        <button class="manage-btn" onclick="removeGerant('${g.name}')">RETIRER</button>
+        <span class="bureau-member-name">◆ ${m.name}</span>
+        <span class="bureau-member-score">${total} missions · ${score}/100 pts</span>
+        <button class="manage-btn" onclick="removeBureauMember('${m.name}')">RETIRER</button>
       </div>`;
     }).join(''):'<div class="log-empty">Aucun membre enregistré.</div>';
   }
-  // Render cartes de notation
+
+  // ── Onglet MISSIONS ──
+  const missionCardsEl=document.getElementById('bureau-mission-cards');
+  if(missionCardsEl){
+    if(!bureauMembers.length){
+      missionCardsEl.innerHTML='<div class="log-empty" style="grid-column:1/-1">Aucun membre à renseigner.</div>';
+    } else {
+      missionCardsEl.innerHTML=bureauMembers.map(m=>{
+        const ms=m.missionStats||{D:0,C:0,B:0,A:0,S:0};
+        const total=(ms.D||0)+(ms.C||0)+(ms.B||0)+(ms.A||0)+(ms.S||0);
+        const ranks=[
+          {k:'D',color:'#aaa'},{k:'C',color:'#4fc3f7'},
+          {k:'B',color:'#81c784'},{k:'A',color:'#ffb74d'},{k:'S',color:'#e040fb'}
+        ];
+        const cols=ranks.map(r=>`
+          <div class="mission-rank-col">
+            <span class="mission-rank-label" style="color:${r.color}">RANG ${r.k}</span>
+            <input class="mission-rank-input" type="number" min="0" value="${ms[r.k]||0}"
+              id="ms-${m.name}-${r.k}">
+          </div>`).join('');
+        return `<div class="bureau-card">
+          <div class="bureau-card-header">
+            <span class="bureau-card-name">◆ ${m.name}</span>
+            <span class="bureau-score-badge" id="ms-total-${m.name}">${total}<span style="font-size:.8rem;color:#7a6a40"> missions</span></span>
+          </div>
+          <div class="mission-rank-grid">${cols}</div>
+          <button class="bureau-save-btn" onclick="saveMissionStats('${m.name}')">✓ ENREGISTRER</button>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  // ── Onglet NOTATION ──
   const cardsEl=document.getElementById('bureau-cards');
   if(!cardsEl)return;
-  if(!members.length){cardsEl.innerHTML='<div class="log-empty" style="grid-column:1/-1">Aucun membre à noter.</div>';return;}
-  cardsEl.innerHTML=members.map(g=>{
-    const s=stats[g.name]||{D:0,C:0,B:0,A:0,S:0,total:0};
-    const r=g.ratings||{};
+  if(!bureauMembers.length){cardsEl.innerHTML='<div class="log-empty" style="grid-column:1/-1">Aucun membre à noter.</div>';return;}
+  cardsEl.innerHTML=bureauMembers.map(m=>{
+    const ms=m.missionStats||{D:0,C:0,B:0,A:0,S:0};
+    const total=(ms.D||0)+(ms.C||0)+(ms.B||0)+(ms.A||0)+(ms.S||0);
+    const r=m.ratings||{};
     const totalScore=CRITERES.reduce((sum,c)=>sum+(parseInt(r[c.key])||0),0);
     const critRows=CRITERES.map(c=>{
       const val=parseInt(r[c.key])||0;
       const pct=Math.min(100,Math.round(val/c.max*100));
       return `<div class="notation-row">
         <span class="notation-label">${c.label}</span>
-        <div class="score-bar-wrap"><div class="score-bar" id="bar-${g.name}-${c.key}" style="width:${pct}%"></div></div>
+        <div class="score-bar-wrap"><div class="score-bar" id="bar-${m.name}-${c.key}" style="width:${pct}%"></div></div>
         <span class="notation-max">/${c.max}</span>
         <input class="notation-input" type="number" min="0" max="${c.max}" value="${val}"
-          id="note-${g.name}-${c.key}"
-          oninput="updateBar('${g.name}','${c.key}',${c.max},this.value)">
+          id="note-${m.name}-${c.key}"
+          oninput="updateBar('${m.name}','${c.key}',${c.max},this.value)">
       </div>`;
     }).join('');
     return `<div class="bureau-card">
       <div class="bureau-card-header">
-        <span class="bureau-card-name">◆ ${g.name}</span>
-        <span class="bureau-score-badge" id="score-total-${g.name}">${totalScore}<span style="font-size:.8rem;color:#7a6a40">/100</span></span>
+        <span class="bureau-card-name">◆ ${m.name}</span>
+        <span class="bureau-score-badge" id="score-total-${m.name}">${totalScore}<span style="font-size:.8rem;color:#7a6a40">/100</span></span>
       </div>
       <div class="bureau-stats-row">
-        <div class="bureau-stat"><div class="val">${s.total}</div><div class="lbl">TOTAL</div></div>
-        <div class="bureau-stat"><div class="val" style="color:#aaa">${s.D}</div><div class="lbl">RANG D</div></div>
-        <div class="bureau-stat"><div class="val" style="color:#4fc3f7">${s.C}</div><div class="lbl">RANG C</div></div>
-        <div class="bureau-stat"><div class="val" style="color:#81c784">${s.B}</div><div class="lbl">RANG B</div></div>
-        <div class="bureau-stat"><div class="val" style="color:#ffb74d">${s.A}</div><div class="lbl">RANG A</div></div>
-        <div class="bureau-stat"><div class="val" style="color:#e040fb">${s.S}</div><div class="lbl">RANG S</div></div>
+        <div class="bureau-stat"><div class="val">${total}</div><div class="lbl">TOTAL</div></div>
+        <div class="bureau-stat"><div class="val" style="color:#aaa">${ms.D||0}</div><div class="lbl">RANG D</div></div>
+        <div class="bureau-stat"><div class="val" style="color:#4fc3f7">${ms.C||0}</div><div class="lbl">RANG C</div></div>
+        <div class="bureau-stat"><div class="val" style="color:#81c784">${ms.B||0}</div><div class="lbl">RANG B</div></div>
+        <div class="bureau-stat"><div class="val" style="color:#ffb74d">${ms.A||0}</div><div class="lbl">RANG A</div></div>
+        <div class="bureau-stat"><div class="val" style="color:#e040fb">${ms.S||0}</div><div class="lbl">RANG S</div></div>
       </div>
       <div class="notation-grid">${critRows}</div>
-      <button class="bureau-save-btn" onclick="saveGerantRating('${g.name}')">✓ ENREGISTRER LA NOTATION</button>
+      <button class="bureau-save-btn" onclick="saveBureauRating('${m.name}')">✓ ENREGISTRER LA NOTATION</button>
     </div>`;
   }).join('');
 }
@@ -1025,6 +1084,68 @@ async function saveGerantRating(name){
   const msg=document.getElementById('bureau-status-msg');
   if(msg){
     msg.textContent=ok?'Notation de '+name+' enregistrée avec succès.':'Erreur lors de la sauvegarde.';
+    msg.style.display='block';
+    msg.style.color=ok?'#20c880':'#e04040';
+    setTimeout(()=>msg.style.display='none',3000);
+  }
+  if(ok)renderBureau();
+}
+
+async function addBureauMember(){
+  const name=document.getElementById('new-bureau-member-name').value.trim();
+  if(!name)return;
+  if(bureauMembers.find(m=>m.name.toLowerCase()===name.toLowerCase())){showStatus('Ce membre existe déjà.',false);return;}
+  bureauMembers.push({name,missionStats:{D:0,C:0,B:0,A:0,S:0},ratings:{}});
+  const ok=await saveData();
+  if(ok){document.getElementById('new-bureau-member-name').value='';renderBureau();showStatus(name+' ajouté au bureau.',true);}
+  else showStatus('Erreur.',false);
+}
+
+async function removeBureauMember(name){
+  if(!confirm(`Retirer ${name} du bureau ?`))return;
+  bureauMembers=bureauMembers.filter(m=>m.name!==name);
+  const ok=await saveData();
+  if(ok){renderBureau();showStatus(name+' retiré du bureau.',true);}
+  else showStatus('Erreur.',false);
+}
+
+async function saveMissionStats(name){
+  const m=bureauMembers.find(m=>m.name===name);
+  if(!m)return;
+  m.missionStats={
+    D:parseInt(document.getElementById('ms-'+name+'-D')?.value)||0,
+    C:parseInt(document.getElementById('ms-'+name+'-C')?.value)||0,
+    B:parseInt(document.getElementById('ms-'+name+'-B')?.value)||0,
+    A:parseInt(document.getElementById('ms-'+name+'-A')?.value)||0,
+    S:parseInt(document.getElementById('ms-'+name+'-S')?.value)||0
+  };
+  const ok=await saveData();
+  const msg=document.getElementById('bureau-status-msg');
+  if(msg){
+    msg.textContent=ok?'Missions de '+name+' enregistrées.':'Erreur lors de la sauvegarde.';
+    msg.style.display='block';
+    msg.style.color=ok?'#20c880':'#e04040';
+    setTimeout(()=>msg.style.display='none',3000);
+  }
+  if(ok)renderBureau();
+}
+
+async function saveBureauRating(name){
+  const CRITERES=[
+    {key:'rapports',max:25},{key:'investissement',max:20},{key:'comportement',max:15},
+    {key:'qualite',max:20},{key:'avis',max:10},{key:'equipe',max:10}
+  ];
+  const m=bureauMembers.find(m=>m.name===name);
+  if(!m)return;
+  m.ratings={};
+  CRITERES.forEach(c=>{
+    const inp=document.getElementById('note-'+name+'-'+c.key);
+    m.ratings[c.key]=Math.min(parseInt(inp?.value)||0,c.max);
+  });
+  const ok=await saveData();
+  const msg=document.getElementById('bureau-status-msg');
+  if(msg){
+    msg.textContent=ok?'Notation de '+name+' enregistrée.':'Erreur lors de la sauvegarde.';
     msg.style.display='block';
     msg.style.color=ok?'#20c880':'#e04040';
     setTimeout(()=>msg.style.display='none',3000);
