@@ -193,6 +193,7 @@
     .bureau-tab:hover{color:#e0c97f}
     .bureau-tab-content{display:none}
     .bureau-tab-content.btc-active{display:block}
+    .ms-wrap{border:1px solid #1a1200;border-radius:8px;overflow:auto;background:#080500}
     .ms-table{width:100%;border-collapse:collapse;font-family:'Rajdhani',sans-serif}
     .ms-table thead tr{background:#0e0900;border-bottom:2px solid #2a1a00}
     .ms-table thead th{padding:8px 10px;font-family:'Cinzel',serif;font-size:.68rem;letter-spacing:2px;color:#c88600;text-align:center}
@@ -438,7 +439,7 @@
         <div class="bureau-section-title" style="margin-bottom:0;border:none">MISSIONS PAR GÉRANT</div>
         <button class="bureau-reset-btn" onclick="resetAllMissions()">↺ RESET TOUT</button>
       </div>
-      <div class="bureau-grid" id="bureau-mission-cards"></div>
+      <div id="bureau-mission-cards"></div>
     </div>
     <!-- ONGLET NOTATION -->
     <div id="bureau-tab-notation" class="bureau-tab-content">
@@ -463,7 +464,7 @@
 </div>
 
 <footer>Sunagakure · Bureau des Missions · Registre des Mérites</footer>
-<div id="site-version" style="position:fixed;bottom:10px;right:12px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.78rem;color:#e0a800;background:rgba(10,7,0,.85);border:1px solid #3a2a00;border-radius:4px;padding:3px 9px;letter-spacing:2px;z-index:99999;pointer-events:none">v3.0 · 25/07</div>
+<div id="site-version" style="position:fixed;bottom:10px;right:12px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.78rem;color:#e0a800;background:rgba(10,7,0,.85);border:1px solid #3a2a00;border-radius:4px;padding:3px 9px;letter-spacing:2px;z-index:99999;pointer-events:none">v3.1 · 25/07</div>
 
 <!-- PROFILE MODAL -->
 <div class="modal-overlay" id="profile-overlay" onclick="closeProfile(event)">
@@ -1040,29 +1041,21 @@ function renderBureau(){
         {k:'D',color:'#aaa'},{k:'C',color:'#4fc3f7'},
         {k:'B',color:'#81c784'},{k:'A',color:'#ffb74d'},{k:'S',color:'#e040fb'}
       ];
-      missionCardsEl.innerHTML=bureauMembers.map(m=>{
+      const tbody=bureauMembers.map(m=>{
         const ms=m.missionStats||{D:0,C:0,B:0,A:0,S:0};
         const total=(ms.D||0)+(ms.C||0)+(ms.B||0)+(ms.A||0)+(ms.S||0);
-        const maxVal=Math.max(1,...ranks.map(r=>ms[r.k]||0));
-        const rows=ranks.map(r=>{
-          const val=ms[r.k]||0;
-          const pct=Math.round(val/maxVal*100);
-          return `<div class="mission-rank-row">
-            <span class="mission-rank-lbl" style="color:${r.color}">RANG ${r.k}</span>
-            <button class="mission-pm-btn" onclick="changeMission('${m.name}','${r.k}',-1)">−</button>
-            <span class="mission-count-val" id="msv-${m.name}-${r.k}">${val}</span>
-            <button class="mission-pm-btn" onclick="changeMission('${m.name}','${r.k}',1)">+</button>
-            <div class="mission-rank-bar"><div class="mission-rank-bar-fill" id="msb-${m.name}-${r.k}" style="width:${pct}%;background:${r.color}"></div></div>
-          </div>`;
-        }).join('');
-        return `<div class="bureau-card">
-          <div class="bureau-card-header">
-            <span class="bureau-card-name">◆ ${m.name}</span>
-            <span class="bureau-score-badge" id="ms-total-${m.name}">${total}<span style="font-size:.8rem;color:#7a6a40"> missions</span></span>
-          </div>
-          <div style="border:1px solid #1a1200;border-radius:6px;overflow:hidden">${rows}</div>
-        </div>`;
+        const cells=ranks.map(r=>`<td><div class="ms-cell">`
+          +`<button class="ms-pm" onclick="changeMission('${m.name}','${r.k}',-1)">&minus;</button>`
+          +`<span class="ms-val" id="msv-${m.name}-${r.k}" style="color:${r.color}">${ms[r.k]||0}</span>`
+          +`<button class="ms-pm" onclick="changeMission('${m.name}','${r.k}',1)">+</button>`
+          +`</div></td>`).join('');
+        return `<tr><td>&#9670; ${m.name}</td>${cells}<td class="ms-total" id="ms-total-${m.name}">${total}</td></tr>`;
       }).join('');
+      missionCardsEl.innerHTML=`<div class="ms-wrap"><table class="ms-table"><thead><tr>`
+        +`<th>MEMBRE</th>`
+        +ranks.map(r=>`<th style="color:${r.color}">${r.k}</th>`).join('')
+        +`<th style="color:#c88600">TOTAL</th>`
+        +`</tr></thead><tbody>${tbody}</tbody></table></div>`;
     }
   }
 
