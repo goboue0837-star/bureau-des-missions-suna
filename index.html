@@ -193,18 +193,27 @@
     .bureau-tab:hover{color:#e0c97f}
     .bureau-tab-content{display:none}
     .bureau-tab-content.btc-active{display:block}
-    .mission-rank-row{display:flex;align-items:center;gap:12px;padding:9px 14px;border-bottom:1px solid #111;background:#080600}
-    .mission-rank-row:first-child{border-radius:6px 6px 0 0}
-    .mission-rank-row:last-child{border-bottom:none;border-radius:0 0 6px 6px}
-    .mission-rank-lbl{font-family:'Cinzel',serif;font-size:.8rem;letter-spacing:2px;min-width:60px}
-    .mission-count-val{font-family:'Cinzel',serif;font-size:1.1rem;color:#e0c97f;min-width:32px;text-align:center}
-    .mission-pm-btn{background:#0e0900;border:1px solid #3a2a00;color:#c88600;width:30px;height:30px;border-radius:4px;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
-    .mission-pm-btn:hover{background:#1a0f00;border-color:#c88600}
-    .mission-pm-btn:active{transform:scale(.92)}
-    .mission-rank-bar{flex:1;background:#1a1200;border-radius:3px;height:4px;overflow:hidden}
-    .mission-rank-bar-fill{height:100%;border-radius:3px;transition:width .3s}
-    .bureau-reset-btn{background:none;border:1px solid #3a0000;color:#804040;padding:8px 20px;font-family:'Rajdhani',sans-serif;font-size:.85rem;letter-spacing:2px;border-radius:4px;cursor:pointer;transition:all .2s}
+    .ms-table{width:100%;border-collapse:collapse;font-family:'Rajdhani',sans-serif}
+    .ms-table thead tr{background:#0e0900;border-bottom:2px solid #2a1a00}
+    .ms-table thead th{padding:8px 10px;font-family:'Cinzel',serif;font-size:.68rem;letter-spacing:2px;color:#c88600;text-align:center}
+    .ms-table thead th:first-child{text-align:left}
+    .ms-table tbody tr{border-bottom:1px solid #111;transition:background .12s}
+    .ms-table tbody tr:hover{background:#0e0900}
+    .ms-table tbody td{padding:6px 8px;text-align:center;vertical-align:middle}
+    .ms-table tbody td:first-child{text-align:left;font-family:'Cinzel',serif;font-size:.85rem;color:#e0c97f;padding-left:14px}
+    .ms-cell{display:inline-flex;align-items:center;gap:4px}
+    .ms-pm{background:#0a0700;border:1px solid #2a1a00;color:#c88600;width:22px;height:22px;border-radius:3px;font-size:.95rem;cursor:pointer;line-height:1;transition:all .12s;flex-shrink:0}
+    .ms-pm:hover{background:#1a0f00;border-color:#c88600}
+    .ms-pm:active{transform:scale(.88)}
+    .ms-val{font-family:'Cinzel',serif;font-size:.9rem;color:#e0c97f;min-width:22px;text-align:center}
+    .ms-total{font-family:'Cinzel',serif;font-size:.9rem;color:#c88600;font-weight:700}
+    .warn-cell{display:inline-flex;align-items:center;gap:4px}
+    .warn-count{font-family:'Cinzel',serif;font-size:.85rem;min-width:18px;text-align:center;font-weight:700}
+    .warn-0{color:#3a2a00}.warn-1{color:#c88600}.warn-2{color:#e07020}.warn-3,.warn-high{color:#e04040}
+    .bureau-reset-btn{background:none;border:1px solid #3a0000;color:#804040;padding:7px 16px;font-family:'Rajdhani',sans-serif;font-size:.82rem;letter-spacing:2px;border-radius:4px;cursor:pointer;transition:all .2s}
     .bureau-reset-btn:hover{border-color:#c00;color:#ff6060;background:#1a0000}
+    .warn-pm{background:#0a0700;border:1px solid #2a1a00;color:#7a6a40;width:20px;height:20px;border-radius:3px;font-size:.85rem;cursor:pointer;line-height:1;transition:all .12s}
+    .warn-pm:hover{border-color:#c88600;color:#c88600;background:#1a0f00}
     .paye-row{display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid #111;background:#0a0700}
     .paye-row:first-child{border-radius:8px 8px 0 0}
     .paye-row:last-child{border-bottom:none;border-radius:0 0 8px 8px}
@@ -1006,9 +1015,15 @@ function renderBureau(){
       const score=CRITERES.reduce((s,c)=>s+(parseInt(r[c.key])||0),0);
       const ms=m.missionStats||{D:0,C:0,B:0,A:0,S:0};
       const total=(ms.D||0)+(ms.C||0)+(ms.B||0)+(ms.A||0)+(ms.S||0);
+      const w=m.warnings||0;const wCls=w===0?'warn-0':w===1?'warn-1':w===2?'warn-2':'warn-high';
       return `<div class="bureau-member-row">
         <span class="bureau-member-name">◆ ${m.name}</span>
         <span class="bureau-member-score">${total} missions · ${score}/100 pts</span>
+        <div style="display:flex;align-items:center;gap:6px">
+          <button class="warn-pm" onclick="changeWarning('${m.name}',-1)">−</button>
+          <span class="warn-count ${wCls}" title="Avertissements">${w}⚠</span>
+          <button class="warn-pm" onclick="changeWarning('${m.name}',1)">+</button>
+        </div>
         <button class="manage-btn" onclick="removeBureauMember('${m.name}')">RETIRER</button>
       </div>`;
     }).join(''):'<div class="log-empty">Aucun membre enregistré.</div>';
@@ -1153,21 +1168,12 @@ async function changeMission(name,rank,delta){
   if(!m)return;
   if(!m.missionStats)m.missionStats={D:0,C:0,B:0,A:0,S:0};
   m.missionStats[rank]=Math.max(0,(m.missionStats[rank]||0)+delta);
-  // Mise à jour UI instantanée
   const valEl=document.getElementById('msv-'+name+'-'+rank);
   if(valEl)valEl.textContent=m.missionStats[rank];
   const ranks=['D','C','B','A','S'];
   const total=ranks.reduce((s,r)=>s+(m.missionStats[r]||0),0);
   const totalEl=document.getElementById('ms-total-'+name);
-  if(totalEl)totalEl.firstChild.textContent=total;
-  // Recalc barres
-  const maxVal=Math.max(1,...ranks.map(r=>m.missionStats[r]||0));
-  const colors={D:'#aaa',C:'#4fc3f7',B:'#81c784',A:'#ffb74d',S:'#e040fb'};
-  ranks.forEach(r=>{
-    const bar=document.getElementById('msb-'+name+'-'+r);
-    if(bar)bar.style.width=Math.round((m.missionStats[r]||0)/maxVal*100)+'%';
-  });
-  // Sauvegarde Firestore en arrière-plan
+  if(totalEl)totalEl.textContent=total;
   saveData();
 }
 
@@ -1205,6 +1211,16 @@ function calculerPaye(){
   const eligibleCount=eligible.length;
   const totalDistrib=montant>0?`<div style="text-align:right;font-family:'Cinzel',serif;font-size:.8rem;color:#7a6a40;margin-top:10px">${eligibleCount} membre${eligibleCount!==1?'s':''} éligible${eligibleCount!==1?'s':''} · Total distribué : ${montant.toLocaleString('fr-FR')} ¥</div>`:'';
   result.innerHTML=`<div style="border:1px solid #2a1a00;border-radius:8px;overflow:hidden">${rows}</div>${totalDistrib}`;
+}
+
+async function changeWarning(name,delta){
+  const m=bureauMembers.find(m=>m.name===name);
+  if(!m)return;
+  m.warnings=Math.max(0,(m.warnings||0)+delta);
+  saveData();
+  // Update UI
+  const wEl=document.querySelector(`[onclick*="changeWarning('${name}'"] ~ .warn-count, .warn-count`);
+  renderBureau();
 }
 
 async function resetAllMissions(){
