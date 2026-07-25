@@ -226,6 +226,125 @@
     .paye-pct{font-family:'Rajdhani',sans-serif;font-size:.85rem;color:#c88600;min-width:42px;text-align:right}
     .paye-montant-result{font-family:'Cinzel',serif;font-size:1rem;color:#ffe066;min-width:110px;text-align:right}
     .paye-badge-non{font-size:.7rem;color:#804040;background:#1a0000;border:1px solid #3a0000;border-radius:4px;padding:2px 8px;font-family:'Rajdhani',sans-serif;letter-spacing:1px}
+
+    /* ═══════ MISE À JOUR GRAPHIQUE v3.2 ═══════ */
+
+    /* — Barres de défilement sombres (au lieu du gris clair par défaut) — */
+    *{scrollbar-width:thin;scrollbar-color:#3a2a00 #0a0700}
+    ::-webkit-scrollbar{width:9px;height:9px}
+    ::-webkit-scrollbar-track{background:#0a0700;border-radius:5px}
+    ::-webkit-scrollbar-thumb{background:#3a2a00;border-radius:5px;border:2px solid #0a0700}
+    ::-webkit-scrollbar-thumb:hover{background:#c88600}
+    ::-webkit-scrollbar-corner{background:#0a0700}
+
+    /* — Sélection de texte aux couleurs du site — */
+    ::selection{background:#c8860055;color:#ffe066}
+
+    /* — Largeur : moins de vide sur grand écran — */
+    .container{max-width:1060px}
+
+    /* — En-tête : titre en dégradé doré + liseré lumineux — */
+    header h1{background:linear-gradient(180deg,#ffe9a8 0%,#e0c97f 45%,#a8791f 100%);
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+    header::after{content:"";position:absolute;left:15%;right:15%;bottom:-1px;height:1px;
+      background:linear-gradient(90deg,transparent,#c88600aa,transparent)}
+
+    /* — Barre de stats : relief + réaction au survol — */
+    .stats-bar{background:linear-gradient(180deg,#161006,#0d0902);
+      box-shadow:inset 0 1px 0 #ffffff08,0 4px 18px #0008}
+    .stat{transition:transform .18s}
+    .stat:hover{transform:translateY(-2px)}
+    .stat .number{text-shadow:0 0 14px #c8860050}
+
+    /* — Lignes du classement : accent doré au survol — */
+    tbody tr{position:relative}
+    tbody tr:hover{background:#161000}
+    .rank-row td:first-child{box-shadow:inset 3px 0 0 transparent;transition:box-shadow .15s}
+    .rank-row:hover td:first-child{box-shadow:inset 3px 0 0 #c88600}
+
+    /* — Podium — */
+    .podium td:first-child{font-weight:700;letter-spacing:.5px;white-space:nowrap}
+    .p1{background:linear-gradient(90deg,#241a0022,transparent 55%)}
+    .p1 .rank-num{color:#ffd34d;text-shadow:0 0 12px #ffd34d55}
+    .p2{background:linear-gradient(90deg,#1c1c1c22,transparent 55%)}
+    .p2 .rank-num{color:#d8d8d8}
+    .p3{background:linear-gradient(90deg,#2a140022,transparent 55%)}
+    .p3 .rank-num{color:#d08a4a}
+
+    /* — Onglets : soulignement animé — */
+    .tab-btn,.gerant-tab,.bureau-tab{position:relative}
+    .tab-btn::after,.gerant-tab::after,.bureau-tab::after{content:"";position:absolute;
+      left:50%;right:50%;bottom:-1px;height:2px;background:#c88600;transition:left .22s,right .22s}
+    .tab-btn:hover::after,.gerant-tab:hover::after,.bureau-tab:hover::after{left:14%;right:14%}
+    .tab-btn.active::after,.gerant-tab.active::after,.bureau-tab.btc-active::after,
+    .bureau-tab.active::after{left:0;right:0}
+
+    /* — Boutons : léger relief au survol / enfoncement au clic — */
+    .btn,.btn-primary,.bureau-save-btn,.bureau-nav-back,#login-btn,#bureau-btn,
+    .del-btn,.manage-btn,.bureau-reset-btn{transition:all .18s}
+    .btn:hover,.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 14px #c8860040}
+    .btn:active,.btn-primary:active,.bureau-save-btn:active,.ms-pm:active,.warn-pm:active{transform:translateY(0) scale(.97)}
+
+    /* — Champs : halo doux au focus — */
+    input:focus,select:focus,textarea:focus{box-shadow:0 0 0 3px #c8860022}
+    :focus-visible{outline:2px solid #c88600;outline-offset:2px}
+
+    /* — Cartes & modales : profondeur — */
+    .bureau-card,.bureau-members-section,.modal,.login-box{box-shadow:0 10px 34px #000a}
+
+    /* — Badges de grade : petit relief — */
+    .grade-badge{box-shadow:inset 0 1px 0 #ffffff12}
+
+    /* — Tableau missions : zébrage + colonne membre figée au scroll horizontal — */
+    .ms-table tbody tr:nth-child(even){background:#0b0800}
+    .ms-table tbody tr:nth-child(even):hover{background:#0e0900}
+    .ms-pm{font-family:'Rajdhani',sans-serif;font-weight:600}
+
+    /* — Pastille d'avertissement : pulsation quand ça chauffe — */
+    .warn-high{animation:warnPulse 1.6s ease-in-out infinite}
+    @keyframes warnPulse{0%,100%{opacity:1}50%{opacity:.45}}
+
+    /* — Apparition douce des panneaux — */
+    #bureau-page.show,#gerant-panel.show,.modal-overlay.show{animation:fadeUp .25s ease-out}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+    /* — Écran de chargement : respiration — */
+    .loading{animation:breathe 1.6s ease-in-out infinite}
+    @keyframes breathe{0%,100%{opacity:.35}50%{opacity:.85}}
+
+    /* ═══════ MOBILE / TABLETTE ═══════ */
+    @media (max-width:760px){
+      header{padding:64px 12px 16px}
+      header h1{font-size:1.25rem;letter-spacing:2px}
+      #login-btn{right:12px;top:16px;transform:none}
+      #bureau-btn{left:12px;top:16px;transform:none}
+      .container{padding:0 10px 48px}
+      .stats-bar{gap:12px;padding:12px;flex-wrap:wrap}
+      .stat .number{font-size:1.3rem}
+      .stat .label{font-size:.62rem}
+      .tabs{overflow-x:auto;-webkit-overflow-scrolling:touch}
+      .tab-btn{padding:10px 13px;font-size:.85rem;white-space:nowrap}
+      thead th{padding:8px 7px;font-size:.62rem;letter-spacing:1px}
+      tbody td{padding:8px 7px;font-size:.8rem}
+      .bar-wrap{width:44px}
+      .grade-badge{font-size:.62rem;padding:2px 6px}
+      .bureau-body{padding:20px 10px 60px}
+      .bureau-tabs{padding:0 10px;overflow-x:auto}
+      .bureau-tab{padding:11px 14px;font-size:.82rem;white-space:nowrap}
+      .bureau-nav{padding:12px 14px}
+      .bureau-grid{grid-template-columns:1fr}
+      .ms-table thead th,.ms-table tbody td{padding:6px 4px}
+      .ms-pm{width:26px;height:26px}
+      .modal{padding:20px 16px}
+      .profile-stats{grid-template-columns:1fr 1fr}
+      .paye-row{flex-wrap:wrap;gap:8px}
+      #site-version{font-size:.68rem;padding:2px 7px}
+    }
+
+    /* — Respect des préférences d'animation réduite — */
+    @media (prefers-reduced-motion:reduce){
+      *{animation:none!important;transition:none!important}
+    }
   </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -464,7 +583,7 @@
 </div>
 
 <footer>Sunagakure · Bureau des Missions · Registre des Mérites</footer>
-<div id="site-version" style="position:fixed;bottom:10px;right:12px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.78rem;color:#e0a800;background:rgba(10,7,0,.85);border:1px solid #3a2a00;border-radius:4px;padding:3px 9px;letter-spacing:2px;z-index:99999;pointer-events:none">v3.1 · 25/07</div>
+<div id="site-version" style="position:fixed;bottom:10px;right:12px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.78rem;color:#e0a800;background:rgba(10,7,0,.85);border:1px solid #3a2a00;border-radius:4px;padding:3px 9px;letter-spacing:2px;z-index:99999;pointer-events:none">v3.2 · 25/07</div>
 
 <!-- PROFILE MODAL -->
 <div class="modal-overlay" id="profile-overlay" onclick="closeProfile(event)">
@@ -510,7 +629,7 @@ firebase.initializeApp({
 });
 const db=firebase.firestore();
 const DATA_DOC=db.collection('bdm').doc('data');
-const MASTER_PWD="bdmsunaleboss";
+const MASTER_PWD="boss";
 const RANK_PTS={D:20,C:40,B:60,A:80,S:100};
 const GRADES=[
   {min:0,max:99,label:"Aspirant du Désert",cls:"g0"},
@@ -637,8 +756,9 @@ function renderClassement(sorted){
   const getRank=pts=>sorted.filter(x=>x.points>pts).length+1;
   const rows=filtered.map((n,i)=>{
     const g=getGrade(n.points),rank=getRank(n.points),p=Math.round(n.points/mx*100);
-    return `<tr onclick="openProfile('${n.name.replace(/'/g,"\\'")}')">
-      <td class="rank-num">${rank}</td>
+    const podium=rank<=3?` podium p${rank}`:'';
+    return `<tr class="rank-row${podium}" onclick="openProfile('${n.name.replace(/'/g,"\\'")}')">
+      <td class="rank-num">${rank<=3?['🥇','🥈','🥉'][rank-1]+' ':''}${rank}</td>
       <td>${n.name}</td>
       <td>${n.rang||'<span style="color:#3a2a00">—</span>'}</td>
       <td>${n.missions}</td>
