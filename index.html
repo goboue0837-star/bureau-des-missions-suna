@@ -370,7 +370,7 @@
 
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('classement',this)">CLASSEMENT</button>
-    <button class="tab-btn" onclick="switchTab('année',this)">⚡ ANNÉE</button>
+    <button class="tab-btn" onclick="switchTab('année',this)">⚡ CONCOURS DE MISSIONS</button>
     <button class="tab-btn" onclick="switchTab('grade',this)">PAR GRADE</button>
   </div>
 
@@ -504,9 +504,9 @@
       <hr class="sep">
 
       <!-- Reset année -->
-      <div class="section-label">CLASSEMENT DE LA ANNÉE</div>
-      <div style="font-size:.82rem;color:#7a6a40;margin-bottom:10px">Réinitialise les points de la année pour tous les joueurs. Irréversible.</div>
-      <button class="btn btn-blue btn-sm" onclick="resetYear()">⚡ RÉINITIALISER L'ANNÉE</button>
+      <div class="section-label">CONCOURS DE MISSIONS</div>
+      <div style="font-size:.82rem;color:#7a6a40;margin-bottom:10px">Réinitialise les points du concours de missions pour tous les joueurs. Irréversible.</div>
+      <button class="btn btn-blue btn-sm" onclick="resetYear()">⚡ RÉINITIALISER LE CONCOURS</button>
 
     </div>
 
@@ -583,7 +583,7 @@
 </div>
 
 <footer>Sunagakure · Bureau des Missions · Registre des Mérites</footer>
-<div id="site-version" style="position:fixed;bottom:10px;right:12px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.78rem;color:#e0a800;background:rgba(10,7,0,.85);border:1px solid #3a2a00;border-radius:4px;padding:3px 9px;letter-spacing:2px;z-index:99999;pointer-events:none">v3.2 · 25/07</div>
+<div id="site-version" style="position:fixed;bottom:10px;right:12px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.78rem;color:#e0a800;background:rgba(10,7,0,.85);border:1px solid #3a2a00;border-radius:4px;padding:3px 9px;letter-spacing:2px;z-index:99999;pointer-events:none">v3.3 · 26/07</div>
 
 <!-- PROFILE MODAL -->
 <div class="modal-overlay" id="profile-overlay" onclick="closeProfile(event)">
@@ -596,7 +596,7 @@
       <div class="pstat"><div class="val" id="p-pts">—</div><div class="lbl">POINTS</div></div>
       <div class="pstat"><div class="val" id="p-missions">—</div><div class="lbl">MISSIONS</div></div>
       <div class="pstat"><div class="val" id="p-taux">—</div><div class="lbl">RÉUSSITE</div></div>
-      <div class="pstat"><div class="val" id="p-week">—</div><div class="lbl">ANNÉE</div></div>
+      <div class="pstat"><div class="val" id="p-week">—</div><div class="lbl">CONCOURS</div></div>
     </div>
     <div class="profile-history">
       <h4>HISTORIQUE DES MISSIONS</h4>
@@ -793,10 +793,10 @@ function renderAnnée(){
   const resetBtn=isGerant?`<button class="btn btn-blue btn-sm" onclick="resetYear()" style="white-space:nowrap">⚡ Réinitialiser</button>`:'';
   document.getElementById('tab-année').innerHTML=`
     <div class="week-header">
-      <span class="week-reset-info">⚡ POINTS DE LA ANNÉE — ${resetInfo}</span>
+      <span class="week-reset-info">⚡ CONCOURS DE MISSIONS — ${resetInfo}</span>
       ${resetBtn}
     </div>
-    <div style="max-height:450px;overflow-y:auto;border:1px solid #1e1400;border-radius:6px"><table><thead><tr><th style="position:sticky;top:0;background:#140e00;z-index:1">#</th><th style="position:sticky;top:0;background:#140e00;z-index:1">NINJA</th><th style="position:sticky;top:0;background:#140e00;z-index:1">RANG</th><th style="position:sticky;top:0;background:#140e00;z-index:1">MISSIONS</th><th style="position:sticky;top:0;background:#140e00;z-index:1">PTS ANNÉE</th><th style="position:sticky;top:0;background:#140e00;z-index:1"></th></tr></thead><tbody>${rows||'<tr><td colspan="6" style="text-align:center;color:#3a2a00;padding:20px">Aucune mission cette année.</td></tr>'}</tbody></table></div>`;
+    <div style="max-height:450px;overflow-y:auto;border:1px solid #1e1400;border-radius:6px"><table><thead><tr><th style="position:sticky;top:0;background:#140e00;z-index:1">#</th><th style="position:sticky;top:0;background:#140e00;z-index:1">NINJA</th><th style="position:sticky;top:0;background:#140e00;z-index:1">RANG</th><th style="position:sticky;top:0;background:#140e00;z-index:1">MISSIONS</th><th style="position:sticky;top:0;background:#140e00;z-index:1">PTS CONCOURS</th><th style="position:sticky;top:0;background:#140e00;z-index:1"></th></tr></thead><tbody>${rows||'<tr><td colspan="6" style="text-align:center;color:#3a2a00;padding:20px">Aucune mission dans ce concours.</td></tr>'}</tbody></table></div>`;
 }
 
 function renderGrade(sorted){
@@ -849,7 +849,7 @@ function renderHistory(){
     if(h.type==='add')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${who}</div><span class="log-add">+ Ajout ninja</span> — ${h.ninja}${h.rang?' ('+h.rang+')':''}</div>`;
     if(h.type==='remove')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${who}</div><span class="log-remove">✕ Suppression</span> — ${h.ninja}</div>`;
     if(h.type==='rang')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${who}</div><span class="log-add">✎ Rang modifié</span> — ${h.ninja} → ${h.rang||'—'}</div>`;
-    if(h.type==='year_reset')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${who}</div><span class="log-week">⚡ Réinitialisation année</span></div>`;
+    if(h.type==='year_reset')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${who}</div><span class="log-week">⚡ Réinitialisation du concours</span></div>`;
     if(h.type==='delete_entry')return`<div class="log-item"><div class="log-date">${fmtDate(h.date)} — par ${who}</div><span class="log-remove">✕ Entrée supprimée</span> — ${h.ninja} : ${h.entry}</div>`;
     return'';
   }).join('');
@@ -1045,12 +1045,12 @@ async function editRang(){
 }
 
 async function resetYear(){
-  if(!confirm('Réinitialiser les points de la année pour tous les ninja ? Irréversible.'))return;
+  if(!confirm('Réinitialiser les points du concours de missions pour tous les ninja ? Irréversible.'))return;
   ninjas.forEach(n=>{n.yearlyPoints=0;n.yearlyMissions=0;});
   yearlyReset=new Date().toISOString();
   globalHistory.push({type:'year_reset',date:yearlyReset,by:currentGerantName});
   const ok=await saveData();
-  if(ok){render();showStatus('Année réinitialisée.',true);}
+  if(ok){render();showStatus('Concours de missions réinitialisé.',true);}
   else showStatus('Erreur.',false);
 }
 
