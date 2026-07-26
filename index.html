@@ -593,7 +593,7 @@
 </div>
 
 <footer>Sunagakure · Bureau des Missions · Registre des Mérites</footer>
-<div id="site-version" style="position:fixed;bottom:10px;right:12px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.78rem;color:#e0a800;background:rgba(10,7,0,.85);border:1px solid #3a2a00;border-radius:4px;padding:3px 9px;letter-spacing:2px;z-index:99999;pointer-events:none">v3.6 · 26/07</div>
+<div id="site-version" style="position:fixed;bottom:10px;right:12px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.78rem;color:#e0a800;background:rgba(10,7,0,.85);border:1px solid #3a2a00;border-radius:4px;padding:3px 9px;letter-spacing:2px;z-index:99999;pointer-events:none">v3.7 · 26/07</div>
 
 <!-- PROFILE MODAL -->
 <div class="modal-overlay" id="profile-overlay" onclick="closeProfile(event)">
@@ -642,8 +642,8 @@ const DATA_DOC=db.collection('bdm').doc('data');
 const MASTER_PWD="boss";
 const RANK_PTS={D:20,C:40,B:60,A:80,S:100};
 const GRADES=[
-  {min:0,max:99,label:"Aspirant du Désert",cls:"g0"},
-  {min:100,max:199,label:"Protecteur du Sable",cls:"g1"},
+  {min:0,max:59,label:"Aspirant du Désert",cls:"g0"},
+  {min:60,max:199,label:"Protecteur du Sable",cls:"g1"},
   {min:200,max:399,label:"Gardien du Désert",cls:"g2"},
   {min:400,max:599,label:"Vétéran des Dunes",cls:"g3"},
   {min:600,max:999,label:"Héros de Sunagakure",cls:"g4"},
