@@ -341,6 +341,16 @@
       #site-version{font-size:.68rem;padding:2px 7px}
     }
 
+    /* — Cycle du concours (2 semaines) — */
+    .cycle-line{font-size:.76rem;color:#7a90b0;letter-spacing:1px}
+    .cycle-bar-wrap{height:4px;background:#0d1420;border:1px solid #1a2a40;border-radius:3px;
+      overflow:hidden;margin:-8px 0 14px}
+    .cycle-bar{height:100%;border-radius:3px;transition:width .5s;
+      background:linear-gradient(90deg,#2090e0,#80d0ff)}
+    .cycle-bar.cycle-soon{background:linear-gradient(90deg,#e08020,#ffc060)}
+    .cycle-bar.cycle-over{background:linear-gradient(90deg,#c02020,#ff6060);
+      animation:warnPulse 1.6s ease-in-out infinite}
+
     /* — Respect des préférences d'animation réduite — */
     @media (prefers-reduced-motion:reduce){
       *{animation:none!important;transition:none!important}
@@ -504,9 +514,9 @@
       <hr class="sep">
 
       <!-- Reset année -->
-      <div class="section-label">CONCOURS DE MISSIONS</div>
-      <div style="font-size:.82rem;color:#7a6a40;margin-bottom:10px">Réinitialise les points du concours de missions pour tous les joueurs. Irréversible.</div>
-      <button class="btn btn-blue btn-sm" onclick="resetYear()">⚡ RÉINITIALISER LE CONCOURS</button>
+      <div class="section-label">CONCOURS DE MISSIONS — CYCLE DE 2 SEMAINES</div>
+      <div style="font-size:.82rem;color:#7a6a40;margin-bottom:10px">Remet les points du concours à zéro pour tous les joueurs et relance un cycle de 14 jours à partir de maintenant. Irréversible.</div>
+      <button class="btn btn-blue btn-sm" onclick="resetYear()">⚡ LANCER UN NOUVEAU CYCLE</button>
 
     </div>
 
@@ -583,7 +593,7 @@
 </div>
 
 <footer>Sunagakure · Bureau des Missions · Registre des Mérites</footer>
-<div id="site-version" style="position:fixed;bottom:10px;right:12px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.78rem;color:#e0a800;background:rgba(10,7,0,.85);border:1px solid #3a2a00;border-radius:4px;padding:3px 9px;letter-spacing:2px;z-index:99999;pointer-events:none">v3.3 · 26/07</div>
+<div id="site-version" style="position:fixed;bottom:10px;right:12px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.78rem;color:#e0a800;background:rgba(10,7,0,.85);border:1px solid #3a2a00;border-radius:4px;padding:3px 9px;letter-spacing:2px;z-index:99999;pointer-events:none">v3.4 · 26/07</div>
 
 <!-- PROFILE MODAL -->
 <div class="modal-overlay" id="profile-overlay" onclick="closeProfile(event)">
@@ -747,6 +757,12 @@ function render(){
   if(isGerant){renderGerantLists(sorted);renderRemoveList(sorted);renderGerantList();renderHistory();}
 }
 
+// Rafraîchit le compte à rebours du concours toutes les minutes
+setInterval(()=>{
+  const tab=document.getElementById('tab-année');
+  if(tab&&tab.style.display!=='none'&&ninjas.length)renderAnnée();
+},60000);
+
 function renderClassement(sorted){
   const q=searchVal.toLowerCase();
   const filtered=q?sorted.filter(n=>n.name.toLowerCase().includes(q)):sorted;
@@ -770,20 +786,45 @@ function renderClassement(sorted){
   document.getElementById('tab-classement').innerHTML=`<div style="max-height:450px;overflow-y:auto;border:1px solid #1e1400;border-radius:6px"><table><thead><tr><th style="position:sticky;top:0;background:#140e00;z-index:1">#</th><th style="position:sticky;top:0;background:#140e00;z-index:1">NINJA</th><th style="position:sticky;top:0;background:#140e00;z-index:1">RANG</th><th style="position:sticky;top:0;background:#140e00;z-index:1">MISSIONS</th><th style="position:sticky;top:0;background:#140e00;z-index:1">POINTS</th><th style="position:sticky;top:0;background:#140e00;z-index:1"></th><th style="position:sticky;top:0;background:#140e00;z-index:1">GRADE BDM</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
+// ── Cycle du concours : 2 semaines, redémarre à chaque appui sur RÉINITIALISER ──
+const CYCLE_DAYS=14;
+function cycleInfo(){
+  if(!yearlyReset)return{text:'Aucun cycle démarré — appuie sur Réinitialiser pour lancer le concours.',total:0};
+  const start=new Date(yearlyReset);
+  const end=new Date(start.getTime()+CYCLE_DAYS*864e5);
+  const now=new Date();
+  const msLeft=end-now;
+  const total=CYCLE_DAYS*864e5;
+  const pct=Math.max(0,Math.min(100,Math.round((total-msLeft)/total*100)));
+  const startTxt=fmtDateShort(yearlyReset), endTxt=fmtDateShort(end.toISOString());
+  if(msLeft<=0){
+    const over=Math.floor(-msLeft/864e5);
+    return{text:`Cycle terminé depuis ${over} jour${over>1?'s':''} (${startTxt} → ${endTxt}) — à réinitialiser`,
+      total,pct:100,cls:'cycle-over'};
+  }
+  const d=Math.floor(msLeft/864e5), h=Math.floor(msLeft%864e5/36e5);
+  const rest=d>0?`${d} jour${d>1?'s':''}${h?` et ${h}h`:''}`:`${h}h`;
+  return{text:`${startTxt} → ${endTxt} · fin dans ${rest}`,
+    total,pct,cls:d<=2?'cycle-soon':''};
+}
+
 function renderAnnée(){
   const q=searchVal.toLowerCase();
   const sorted=[...ninjas].sort((a,b)=>(b.yearlyPoints||0)-(a.yearlyPoints||0)||(b.yearlyMissions||0)-(a.yearlyMissions||0));
   const filtered=q?sorted.filter(n=>n.name.toLowerCase().includes(q)):sorted;
   const mx=sorted[0]?Math.max(sorted[0].yearlyPoints||0,1):1;
-  const resetInfo=yearlyReset?'Réinitialisé le '+fmtDateShort(yearlyReset):'';
+  const cy=cycleInfo();
   const getYearRank=pts=>sorted.filter(x=>(x.yearlyPoints||0)>pts).length+1;
   const rows=filtered.map((n,i)=>{
     const p=Math.round((n.yearlyPoints||0)/mx*100);
     const rank=getYearRank(n.yearlyPoints||0);
-    const medal=rank===1&&(n.yearlyPoints||0)>0?'👑 ':'';
-    return `<tr onclick="openProfile('${n.name.replace(/'/g,"\\'")}')">
-      <td class="rank-num">${rank}</td>
-      <td>${medal}${n.name}</td>
+    const hasPts=(n.yearlyPoints||0)>0;
+    const podium=(rank<=3&&hasPts)?` podium p${rank}`:'';
+    const medal=(rank<=3&&hasPts)?['🥇','🥈','🥉'][rank-1]+' ':'';
+    const crown=(rank===1&&hasPts)?'👑 ':'';
+    return `<tr class="rank-row${podium}" onclick="openProfile('${n.name.replace(/'/g,"\\'")}')">
+      <td class="rank-num">${medal}${rank}</td>
+      <td>${crown}${n.name}</td>
       <td>${n.rang||'<span style="color:#3a2a00">—</span>'}</td>
       <td>${n.yearlyMissions||0}</td>
       <td style="color:#2090e0;font-weight:600">${n.yearlyPoints||0}</td>
@@ -793,9 +834,13 @@ function renderAnnée(){
   const resetBtn=isGerant?`<button class="btn btn-blue btn-sm" onclick="resetYear()" style="white-space:nowrap">⚡ Réinitialiser</button>`:'';
   document.getElementById('tab-année').innerHTML=`
     <div class="week-header">
-      <span class="week-reset-info">⚡ CONCOURS DE MISSIONS — ${resetInfo}</span>
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <span class="week-reset-info">⚡ CONCOURS DE MISSIONS — CYCLE DE 2 SEMAINES</span>
+        <span class="cycle-line">${cy.text}</span>
+      </div>
       ${resetBtn}
     </div>
+    ${cy.total?`<div class="cycle-bar-wrap"><div class="cycle-bar ${cy.cls}" style="width:${cy.pct}%"></div></div>`:''}
     <div style="max-height:450px;overflow-y:auto;border:1px solid #1e1400;border-radius:6px"><table><thead><tr><th style="position:sticky;top:0;background:#140e00;z-index:1">#</th><th style="position:sticky;top:0;background:#140e00;z-index:1">NINJA</th><th style="position:sticky;top:0;background:#140e00;z-index:1">RANG</th><th style="position:sticky;top:0;background:#140e00;z-index:1">MISSIONS</th><th style="position:sticky;top:0;background:#140e00;z-index:1">PTS CONCOURS</th><th style="position:sticky;top:0;background:#140e00;z-index:1"></th></tr></thead><tbody>${rows||'<tr><td colspan="6" style="text-align:center;color:#3a2a00;padding:20px">Aucune mission dans ce concours.</td></tr>'}</tbody></table></div>`;
 }
 
@@ -1045,12 +1090,12 @@ async function editRang(){
 }
 
 async function resetYear(){
-  if(!confirm('Réinitialiser les points du concours de missions pour tous les ninja ? Irréversible.'))return;
+  if(!confirm('Remettre les points du concours à zéro et relancer un cycle de 2 semaines ? Irréversible.'))return;
   ninjas.forEach(n=>{n.yearlyPoints=0;n.yearlyMissions=0;});
   yearlyReset=new Date().toISOString();
   globalHistory.push({type:'year_reset',date:yearlyReset,by:currentGerantName});
   const ok=await saveData();
-  if(ok){render();showStatus('Concours de missions réinitialisé.',true);}
+  if(ok){render();showStatus('Nouveau cycle lancé — fin le '+fmtDateShort(new Date(Date.now()+CYCLE_DAYS*864e5).toISOString())+'.',true);}
   else showStatus('Erreur.',false);
 }
 
