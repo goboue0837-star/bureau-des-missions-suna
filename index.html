@@ -593,7 +593,7 @@
 </div>
 
 <footer>Sunagakure · Bureau des Missions · Registre des Mérites</footer>
-<div id="site-version" style="position:fixed;bottom:10px;right:12px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.78rem;color:#e0a800;background:rgba(10,7,0,.85);border:1px solid #3a2a00;border-radius:4px;padding:3px 9px;letter-spacing:2px;z-index:99999;pointer-events:none">v3.7 · 26/07</div>
+<div id="site-version" style="position:fixed;bottom:10px;right:12px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.78rem;color:#e0a800;background:rgba(10,7,0,.85);border:1px solid #3a2a00;border-radius:4px;padding:3px 9px;letter-spacing:2px;z-index:99999;pointer-events:none">v3.8 · 26/07</div>
 
 <!-- PROFILE MODAL -->
 <div class="modal-overlay" id="profile-overlay" onclick="closeProfile(event)">
@@ -684,23 +684,7 @@ function fmtDate(iso){const d=new Date(iso);return d.toLocaleDateString('fr-FR',
 function fmtDateShort(iso){const d=new Date(iso);return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'});}
 
 async function loadData(){
-  let snap=await DATA_DOC.get();
-  // Migration one-shot : si Firestore est vide, on importe depuis JSONBin
-  if(!snap.exists){
-    try{
-      const r=await fetch("https://api.jsonbin.io/v3/b/6a25ba56da38895dfe9605d8/latest",{headers:{"X-Master-Key":"$2a$10$td3NtBvwk1q0e.cArx/UYeT6EvNg227oRjuO7fjPZRRiP/eQXPIm2"}});
-      if(r.ok){
-        const j=await r.json();
-        await DATA_DOC.set({
-          ninjas:j.record.ninjas||[],
-          globalHistory:j.record.globalHistory||[],
-          gerants:j.record.gerants||j.record.admins||[{name:"Aozora",password:"aozora"},{name:"Lior",password:"lior"}],
-          yearlyReset:j.record.yearlyReset||new Date().toISOString()
-        });
-        snap=await DATA_DOC.get();
-      }
-    }catch(e){console.warn('Migration JSONBin→Firestore échouée:',e);}
-  }
+  const snap=await DATA_DOC.get();
   const data=snap.exists?snap.data():{};
   ninjas=(data.ninjas||[]).map(n=>({history:[],rang:'',successCount:0,yearlyPoints:0,yearlyMissions:0,...n}));
   globalHistory=data.globalHistory||[];
