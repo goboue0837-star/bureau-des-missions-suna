@@ -593,7 +593,7 @@
 </div>
 
 <footer>Sunagakure · Bureau des Missions · Registre des Mérites</footer>
-<div id="site-version" style="position:fixed;bottom:10px;right:12px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.78rem;color:#e0a800;background:rgba(10,7,0,.85);border:1px solid #3a2a00;border-radius:4px;padding:3px 9px;letter-spacing:2px;z-index:99999;pointer-events:none">v3.8 · 26/07</div>
+<div id="site-version" style="position:fixed;bottom:10px;right:12px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.78rem;color:#e0a800;background:rgba(10,7,0,.85);border:1px solid #3a2a00;border-radius:4px;padding:3px 9px;letter-spacing:2px;z-index:99999;pointer-events:none">v3.9 · 30/07</div>
 
 <!-- PROFILE MODAL -->
 <div class="modal-overlay" id="profile-overlay" onclick="closeProfile(event)">
@@ -656,6 +656,8 @@ let selectedNinjas=new Set();
 // Suivi des suppressions intentionnelles pour éviter que la fusion les remette
 let deletedNinjaNames=new Set();
 let deletedHistoryEntries={}; // {ninjaName: Set<date>}
+let deletedBureauNames=new Set();  // membres du bureau retirés volontairement
+let deletedGerantNames=new Set();  // gérants supprimés volontairement
 
 function toggleNinja(name){
   if(selectedNinjas.has(name))selectedNinjas.delete(name);
@@ -714,6 +716,19 @@ async function saveData(){
         if(!ourKeys.has(key))globalHistory.push(sh);
       });
       globalHistory.sort((a,b)=>new Date(a.date)-new Date(b.date));
+      // Fusionner les membres du bureau : un onglet ouvert avec une liste
+      // périmée ne doit plus écraser le bureau des autres.
+      (srv.bureauMembers||[]).forEach(sm=>{
+        if(deletedBureauNames.has(sm.name.toLowerCase()))return;
+        const local=bureauMembers.find(m=>m.name.toLowerCase()===sm.name.toLowerCase());
+        if(!local)bureauMembers.push(sm);
+      });
+      // Même protection pour les comptes gérants
+      (srv.gerants||[]).forEach(sg=>{
+        if(deletedGerantNames.has(sg.name.toLowerCase()))return;
+        const local=gerants.find(g=>g.name.toLowerCase()===sg.name.toLowerCase());
+        if(!local)gerants.push(sg);
+      });
       transaction.set(DATA_DOC,{ninjas,globalHistory,gerants,bureauMembers,yearlyReset});
     });
     return true;
@@ -1097,6 +1112,7 @@ async function addGerant(){
 async function removeGerant(name){
   if(gerants.length<=1){showStatus('Impossible — dernier gérant.',false);return;}
   if(!confirm(`Retirer l'accès admin de ${name} ?`))return;
+  deletedGerantNames.add(name.toLowerCase()); // suppression volontaire : ne pas le refusionner
   gerants=gerants.filter(a=>a.name!==name);
   const ok=await saveData();
   if(ok){populateLoginDropdown();renderGerantList();renderBureau();showStatus(name+' retiré des gérants.',true);}
@@ -1300,6 +1316,7 @@ async function addBureauMember(){
 
 async function removeBureauMember(name){
   if(!confirm(`Retirer ${name} du bureau ?`))return;
+  deletedBureauNames.add(name.toLowerCase()); // retrait volontaire : ne pas le refusionner
   bureauMembers=bureauMembers.filter(m=>m.name!==name);
   const ok=await saveData();
   if(ok){renderBureau();showStatus(name+' retiré du bureau.',true);}
